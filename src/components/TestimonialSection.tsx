@@ -1,5 +1,3 @@
-import { Quote } from "lucide-react";
-
 const TestimonialSection = () => {
   const testimonials = [
     {
@@ -23,39 +21,32 @@ const TestimonialSection = () => {
   ];
 
   return (
-    <section className="py-20 lg:py-32 bg-card/50">
+    <section className="py-20 lg:py-32 bg-muted/30">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-            用户真实反馈
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            听听他们如何通过我们的服务实现职业突破
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground font-medium mb-4">
+            用户反馈
           </p>
+          <h2 className="text-3xl lg:text-4xl font-serif font-medium mb-4">
+            真实的成功案例
+          </h2>
+          <div className="w-16 h-px bg-primary mx-auto mt-6" />
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="relative p-8 rounded-2xl bg-background border border-border/50"
+              className="relative p-8 bg-background border-t-2 border-primary/20 hover:border-primary transition-colors"
             >
-              <Quote className="h-8 w-8 text-primary/20 mb-4" />
-              <p className="text-foreground mb-6 leading-relaxed">
+              <p className="text-foreground mb-8 leading-relaxed text-lg italic">
                 "{testimonial.quote}"
               </p>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-semibold">
-                    {testimonial.author[0]}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">{testimonial.author}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {testimonial.role} · {testimonial.company}
-                  </p>
-                </div>
+              <div className="border-t border-border pt-6">
+                <p className="font-medium text-foreground">{testimonial.author}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {testimonial.role}，{testimonial.company}
+                </p>
               </div>
             </div>
           ))}
