@@ -89,9 +89,9 @@ const Header = () => {
                   登录
                 </Button>
               </Link>
-              <Link to="/auth">
+              <Link to="/contact-expert">
                 <Button size="sm" className="gap-1">
-                  开始使用
+                  寻找人工专家
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
