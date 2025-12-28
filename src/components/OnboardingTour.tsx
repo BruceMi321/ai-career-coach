@@ -220,16 +220,26 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
       if (step.target) {
         const element = document.querySelector(step.target) as HTMLElement;
         if (element) {
-          const originalPosition = element.style.position;
           const originalZIndex = element.style.zIndex;
           const originalPointerEvents = element.style.pointerEvents;
           
-          element.style.position = 'relative';
+          // 获取计算后的 position，只有当元素是 static 时才需要设置 relative
+          // 否则保持原有的定位方式，避免布局重排导致页面抖动
+          const computedStyle = getComputedStyle(element);
+          const computedPosition = computedStyle.position;
+          const originalPosition = element.style.position;
+          
+          if (computedPosition === 'static') {
+            element.style.position = 'relative';
+          }
+          
           element.style.zIndex = '10000';
           element.style.pointerEvents = 'auto';
           
           return () => {
-            element.style.position = originalPosition;
+            if (computedPosition === 'static') {
+              element.style.position = originalPosition;
+            }
             element.style.zIndex = originalZIndex;
             element.style.pointerEvents = originalPointerEvents;
           };
