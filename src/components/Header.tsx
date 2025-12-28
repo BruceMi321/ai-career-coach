@@ -73,14 +73,15 @@ const Header = () => {
           </span>
         </Link>
 
-        {/* Desktop Navigation - Simplified */}
+        {/* Desktop Navigation - With Icons */}
         <nav className="hidden lg:flex items-center gap-4 mx-8">
           {navItems.map((item) => (
             <Link
               key={item.label}
               to={item.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
+              <item.icon className="h-3.5 w-3.5" />
               {item.label}
             </Link>
           ))}
@@ -93,10 +94,16 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
-                <Link to="#">{t("关于我们", "About")}</Link>
+                <Link to="#" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  {t("关于我们", "About")}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="#">{t("帮助中心", "Help")}</Link>
+                <Link to="#" className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4" />
+                  {t("帮助中心", "Help")}
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
