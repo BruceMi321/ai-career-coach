@@ -17,12 +17,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useApiConfig, API_PROVIDERS_DATA, ApiConfig } from "@/hooks/useApiConfig";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Settings, Plus, Trash2, Check, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Settings, Plus, Trash2, Check, Eye, EyeOff, ExternalLink, ChevronDown, Bot, FileText, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+// AI职责范围说明
+const AI_ROLE_INFO = {
+  zh: {
+    title: "AI助手职责范围",
+    description: "配置API后，AI将严格专注于以下职业发展服务：",
+    roles: [
+      {
+        icon: FileText,
+        title: "简历分析",
+        items: ["简历与职位匹配度评估", "简历优化建议", "职业发展规划"]
+      },
+      {
+        icon: Users,
+        title: "模拟面试",
+        items: ["行为面试练习", "技术面试模拟", "面试技巧指导"]
+      }
+    ],
+    note: "AI将拒绝回答与职业咨询无关的问题，如编程实现、闲聊等。"
+  },
+  en: {
+    title: "AI Assistant Scope",
+    description: "After API configuration, AI will focus strictly on:",
+    roles: [
+      {
+        icon: FileText,
+        title: "Resume Analysis",
+        items: ["Resume-job matching", "Resume optimization", "Career planning"]
+      },
+      {
+        icon: Users,
+        title: "Mock Interview",
+        items: ["Behavioral interviews", "Technical interviews", "Interview tips"]
+      }
+    ],
+    note: "AI will decline non-career requests like coding, casual chat, etc."
+  }
+};
 
 interface ApiSettingsDialogProps {
   trigger?: React.ReactNode;
@@ -138,6 +181,58 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* AI Role Info Collapsible */}
+          <Collapsible>
+            <Card className="border-primary/20 bg-primary/5">
+              <CollapsibleTrigger asChild>
+                <CardContent className="p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Bot className="h-5 w-5 text-primary" />
+                      <div>
+                        <span className="font-medium">
+                          {language === "zh" ? AI_ROLE_INFO.zh.title : AI_ROLE_INFO.en.title}
+                        </span>
+                        <p className="text-xs text-muted-foreground">
+                          {t("点击查看详情", "Click to view details")}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                  </div>
+                </CardContent>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="pt-0 px-4 pb-4 space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {language === "zh" ? AI_ROLE_INFO.zh.description : AI_ROLE_INFO.en.description}
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {(language === "zh" ? AI_ROLE_INFO.zh.roles : AI_ROLE_INFO.en.roles).map((role, index) => (
+                      <div key={index} className="bg-background rounded-lg p-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <role.icon className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-sm">{role.title}</span>
+                        </div>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          {role.items.map((item, i) => (
+                            <li key={i} className="flex items-center gap-1">
+                              <Check className="h-3 w-3 text-green-500" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground border-t pt-3">
+                    ⚠️ {language === "zh" ? AI_ROLE_INFO.zh.note : AI_ROLE_INFO.en.note}
+                  </p>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+
           {/* Existing Configs */}
           {configs.length > 0 && (
             <div className="space-y-3">
