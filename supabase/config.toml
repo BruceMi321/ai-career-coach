@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.mock-interview]
 verify_jwt = false
+
+[functions.send-reservation-notification]
+verify_jwt = false

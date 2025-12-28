@@ -14,6 +14,7 @@ import Guide from "./pages/Guide";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import Help from "./pages/Help";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const AnimatedRoutes = () => {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
