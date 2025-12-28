@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/hooks/useLanguage";
 import { 
   Target, 
   TrendingUp, 
@@ -52,23 +53,20 @@ const getScoreGradient = (score: number) => {
   return "from-red-500 to-rose-500";
 };
 
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case "高":
-      return "destructive";
-    case "中":
-      return "default";
-    default:
-      return "secondary";
-  }
-};
-
 const AnalysisResult = ({ data }: AnalysisResultProps) => {
+  const { t } = useLanguage();
+
+  const getPriorityColor = (priority: string) => {
+    if (priority === t("高", "High")) return "destructive";
+    if (priority === t("中", "Medium")) return "default";
+    return "secondary";
+  };
+
   if (data.parseError && data.rawAnalysis) {
     return (
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>分析结果</CardTitle>
+          <CardTitle>{t("分析结果", "Analysis Results")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="whitespace-pre-wrap text-sm">{data.rawAnalysis}</div>
@@ -84,7 +82,7 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden">
           <div className={`h-2 bg-gradient-to-r ${getScoreGradient(data.totalScore)}`} />
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl">综合评分</CardTitle>
+            <CardTitle className="text-2xl">{t("综合评分", "Overall Score")}</CardTitle>
             <div className="flex items-center justify-center gap-2 mt-4">
               <span className={`text-6xl font-bold bg-gradient-to-r ${getScoreGradient(data.totalScore)} bg-clip-text text-transparent`}>
                 {data.totalScore}
@@ -106,19 +104,19 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
         <TabsList className="grid w-full grid-cols-4 lg:w-[600px] mx-auto">
           <TabsTrigger value="dimensions" className="gap-2">
             <Target className="h-4 w-4" />
-            <span className="hidden sm:inline">维度分析</span>
+            <span className="hidden sm:inline">{t("维度分析", "Dimensions")}</span>
           </TabsTrigger>
           <TabsTrigger value="strengths" className="gap-2">
             <TrendingUp className="h-4 w-4" />
-            <span className="hidden sm:inline">优劣势</span>
+            <span className="hidden sm:inline">{t("优劣势", "Strengths")}</span>
           </TabsTrigger>
           <TabsTrigger value="suggestions" className="gap-2">
             <Lightbulb className="h-4 w-4" />
-            <span className="hidden sm:inline">改进建议</span>
+            <span className="hidden sm:inline">{t("改进建议", "Suggestions")}</span>
           </TabsTrigger>
           <TabsTrigger value="optimized" className="gap-2">
             <FileEdit className="h-4 w-4" />
-            <span className="hidden sm:inline">优化示例</span>
+            <span className="hidden sm:inline">{t("优化示例", "Examples")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -142,7 +140,7 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
                   <p className="text-sm text-muted-foreground">{dim.analysis}</p>
                   {dim.suggestions && dim.suggestions.length > 0 && (
                     <div className="space-y-1">
-                      <p className="text-xs font-medium text-foreground">改进建议：</p>
+                      <p className="text-xs font-medium text-foreground">{t("改进建议：", "Suggestions:")}</p>
                       <ul className="text-xs text-muted-foreground space-y-1">
                         {dim.suggestions.map((suggestion, i) => (
                           <li key={i} className="flex items-start gap-2">
@@ -165,7 +163,7 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-green-600">
                   <CheckCircle2 className="h-5 w-5" />
-                  核心优势
+                  {t("核心优势", "Key Strengths")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -184,7 +182,7 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-amber-600">
                   <AlertCircle className="h-5 w-5" />
-                  待改进项
+                  {t("待改进项", "Areas for Improvement")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -206,10 +204,10 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lightbulb className="h-5 w-5 text-primary" />
-                优先改进建议
+                {t("优先改进建议", "Priority Improvements")}
               </CardTitle>
               <CardDescription>
-                按优先级排序的具体改进建议
+                {t("按优先级排序的具体改进建议", "Specific suggestions ordered by priority")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -220,7 +218,7 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
                     className="flex items-start gap-4 p-4 rounded-lg bg-background/50 border border-border/50"
                   >
                     <Badge variant={getPriorityColor(item.priority) as "default" | "secondary" | "destructive"}>
-                      {item.priority}优先
+                      {item.priority}{t("优先", " Priority")}
                     </Badge>
                     <div className="flex-1 space-y-1">
                       <p className="font-medium text-sm">{item.suggestion}</p>
@@ -238,8 +236,8 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
             {data.optimizedSections?.summary && (
               <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="text-base">优化后的个人简介</CardTitle>
-                  <CardDescription>参考示例，可直接使用或根据实际情况调整</CardDescription>
+                  <CardTitle className="text-base">{t("优化后的个人简介", "Optimized Summary")}</CardTitle>
+                  <CardDescription>{t("参考示例，可直接使用或根据实际情况调整", "Reference example, use directly or adjust as needed")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
@@ -252,8 +250,8 @@ const AnalysisResult = ({ data }: AnalysisResultProps) => {
             {data.optimizedSections?.experience && (
               <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="text-base">优化后的工作经历描述</CardTitle>
-                  <CardDescription>示例展示如何更好地描述工作成就</CardDescription>
+                  <CardTitle className="text-base">{t("优化后的工作经历描述", "Optimized Experience Description")}</CardTitle>
+                  <CardDescription>{t("示例展示如何更好地描述工作成就", "Example of how to better describe achievements")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
