@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Briefcase, Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {
@@ -26,41 +25,32 @@ const Footer = () => {
   };
 
   return (
-    <footer className="border-t border-border/50 bg-card/30">
-      <div className="container px-4 py-12 lg:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+    <footer className="border-t border-border bg-background">
+      <div className="container px-4 py-16 lg:py-20">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 lg:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <Briefcase className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-lg">yourwaycareer</span>
+            <Link to="/" className="inline-block mb-6">
+              <span className="text-xl tracking-tight">
+                <span className="font-light">your</span>
+                <span className="font-semibold">way</span>
+                <span className="font-light text-primary">career</span>
+              </span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               AI 驱动的职业发展平台，助您实现职业目标
             </p>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                <span>biz@yourwaycareer.com</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                <span>+86 400-123-4567</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span>上海</span>
-              </div>
+            <div className="space-y-1 text-sm text-muted-foreground">
+              <p>biz@yourwaycareer.com</p>
+              <p>上海</p>
             </div>
           </div>
 
           {/* Links */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="font-semibold mb-4">{title}</h4>
-              <ul className="space-y-2">
+              <h4 className="text-sm font-medium uppercase tracking-wider mb-4">{title}</h4>
+              <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -76,19 +66,16 @@ const Footer = () => {
           ))}
         </div>
 
-        <div className="border-t border-border/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
             © 2026 yourwaycareer. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-muted-foreground">
+          <div className="flex gap-8 text-sm text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">
               服务条款
             </Link>
             <Link to="/" className="hover:text-foreground transition-colors">
               隐私政策
-            </Link>
-            <Link to="/" className="hover:text-foreground transition-colors">
-              Cookie 政策
             </Link>
           </div>
         </div>

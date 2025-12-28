@@ -1,4 +1,4 @@
-import { CheckCircle, Zap, Shield, BarChart3 } from "lucide-react";
+import { Check } from "lucide-react";
 import { useCountAnimation } from "@/hooks/useCountAnimation";
 
 interface FeatureBlockProps {
@@ -7,36 +7,20 @@ interface FeatureBlockProps {
   description: string;
   features: string[];
   imagePosition: "left" | "right";
-  icon: React.ReactNode;
   visualType: "matching" | "evaluation" | "optimization";
 }
-
-const DotGrid = () => (
-  <div className="absolute inset-0 opacity-30">
-    <div 
-      className="h-full w-full"
-      style={{
-        backgroundImage: 'radial-gradient(circle, hsl(var(--muted-foreground)) 1px, transparent 1px)',
-        backgroundSize: '20px 20px'
-      }}
-    />
-  </div>
-);
 
 const MatchingVisual = () => {
   const { count, ref } = useCountAnimation({ end: 85, duration: 1500 });
   
   return (
-    <div ref={ref} className="relative rounded-2xl border border-border bg-card overflow-hidden">
-      <DotGrid />
-      <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
-        <div className="text-6xl lg:text-7xl font-light text-primary">
-          {count}<span className="text-3xl lg:text-4xl">%</span>
-        </div>
-        <p className="mt-4 text-muted-foreground text-center max-w-xs">
-          AI 智能分析简历与职位的匹配程度，精准定位提升方向
-        </p>
+    <div ref={ref} className="border-t-2 border-primary p-10 lg:p-12 bg-muted/30">
+      <div className="text-6xl lg:text-7xl font-serif font-medium text-primary mb-4">
+        {count}<span className="text-3xl lg:text-4xl">%</span>
       </div>
+      <p className="text-muted-foreground leading-relaxed">
+        AI 智能分析简历与职位的匹配程度，精准定位提升方向
+      </p>
     </div>
   );
 };
@@ -45,16 +29,13 @@ const EvaluationVisual = () => {
   const { count, ref } = useCountAnimation({ end: 4, duration: 1000 });
   
   return (
-    <div ref={ref} className="relative rounded-2xl border border-border bg-card overflow-hidden">
-      <DotGrid />
-      <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
-        <div className="text-6xl lg:text-7xl font-light text-primary">
-          {count}<span className="text-3xl lg:text-4xl">维度</span>
-        </div>
-        <p className="mt-4 text-muted-foreground text-center max-w-xs">
-          技能匹配、经验相关、表达清晰、关键词覆盖全面评估
-        </p>
+    <div ref={ref} className="border-t-2 border-primary p-10 lg:p-12 bg-muted/30">
+      <div className="text-6xl lg:text-7xl font-serif font-medium text-primary mb-4">
+        {count}<span className="text-3xl lg:text-4xl">维度</span>
       </div>
+      <p className="text-muted-foreground leading-relaxed">
+        技能匹配、经验相关、表达清晰、关键词覆盖全面评估
+      </p>
     </div>
   );
 };
@@ -63,37 +44,35 @@ const OptimizationVisual = () => {
   const { count, ref } = useCountAnimation({ end: 30, duration: 1200 });
   
   return (
-    <div ref={ref} className="relative rounded-2xl border border-border bg-card overflow-hidden">
-      <DotGrid />
-      <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
-        <div className="text-6xl lg:text-7xl font-light text-primary">
-          {count}<span className="text-3xl lg:text-4xl">秒</span>
-        </div>
-        <p className="mt-4 text-muted-foreground text-center max-w-xs">
-          快速生成专业优化建议，立即获得可行的改进方案
-        </p>
+    <div ref={ref} className="border-t-2 border-primary p-10 lg:p-12 bg-muted/30">
+      <div className="text-6xl lg:text-7xl font-serif font-medium text-primary mb-4">
+        {count}<span className="text-3xl lg:text-4xl">秒</span>
       </div>
+      <p className="text-muted-foreground leading-relaxed">
+        快速生成专业优化建议，立即获得可行的改进方案
+      </p>
     </div>
   );
 };
 
-const FeatureBlock = ({ title, highlight, description, features, imagePosition, icon, visualType }: FeatureBlockProps) => {
+const FeatureBlock = ({ title, highlight, description, features, imagePosition, visualType }: FeatureBlockProps) => {
   const content = (
     <div className="space-y-6">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-        {icon}
-        <span>{highlight}</span>
-      </div>
-      <h2 className="text-3xl lg:text-4xl font-bold tracking-tight">
+      <p className="text-sm uppercase tracking-[0.15em] text-primary font-medium">
+        {highlight}
+      </p>
+      <h2 className="text-3xl lg:text-4xl font-serif font-medium leading-tight">
         {title}
       </h2>
-      <p className="text-muted-foreground text-lg">
+      <p className="text-muted-foreground text-lg leading-relaxed">
         {description}
       </p>
-      <ul className="space-y-3">
+      <ul className="space-y-4 pt-2">
         {features.map((feature, index) => (
           <li key={index} className="flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+            <div className="h-5 w-5 rounded-full border border-primary flex items-center justify-center shrink-0 mt-0.5">
+              <Check className="h-3 w-3 text-primary" />
+            </div>
             <span className="text-muted-foreground">{feature}</span>
           </li>
         ))}
@@ -136,7 +115,6 @@ const FeatureSection = () => {
             "提供详细的匹配度评分和分析报告",
           ]}
           imagePosition="right"
-          icon={<Zap className="h-4 w-4" />}
           visualType="matching"
         />
 
@@ -150,7 +128,6 @@ const FeatureSection = () => {
             "ATS 系统友好度检测",
           ]}
           imagePosition="left"
-          icon={<BarChart3 className="h-4 w-4" />}
           visualType="evaluation"
         />
 
@@ -164,7 +141,6 @@ const FeatureSection = () => {
             "帮助您突出核心竞争优势",
           ]}
           imagePosition="right"
-          icon={<Shield className="h-4 w-4" />}
           visualType="optimization"
         />
       </div>
