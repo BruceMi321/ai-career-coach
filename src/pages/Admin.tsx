@@ -12,10 +12,14 @@ import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, RefreshCw, Mail, Settings, Users, Building2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Mail, Settings, Users, Building2, Shield, Trash2, Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import type { Database } from '@/integrations/supabase/types';
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface EnterpriseReservation {
   id: string;
@@ -39,6 +43,14 @@ interface EmailConfig {
   updated_at: string;
 }
 
+interface UserWithRoles {
+  id: string;
+  email: string | null;
+  display_name: string | null;
+  created_at: string;
+  roles: AppRole[];
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -51,6 +63,10 @@ const Admin = () => {
   const [loadingReservations, setLoadingReservations] = useState(true);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [savingConfig, setSavingConfig] = useState(false);
+  
+  const [users, setUsers] = useState<UserWithRoles[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selectedRole, setSelectedRole] = useState<AppRole>('user');
 
   const [configForm, setConfigForm] = useState({
     notification_email: '',
@@ -79,6 +95,7 @@ const Admin = () => {
     if (isAdmin) {
       fetchReservations();
       fetchEmailConfig();
+      fetchUsers();
     }
   }, [isAdmin]);
 
@@ -127,6 +144,126 @@ const Admin = () => {
     } finally {
       setLoadingConfig(false);
     }
+  };
+
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      // Fetch all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (profilesError) throw profilesError;
+
+      // Fetch all user roles
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      if (rolesError) throw rolesError;
+
+      // Combine profiles with their roles
+      const usersWithRoles: UserWithRoles[] = (profiles || []).map(profile => ({
+        id: profile.id,
+        email: profile.email,
+        display_name: profile.display_name,
+        created_at: profile.created_at,
+        roles: (roles || [])
+          .filter(r => r.user_id === profile.id)
+          .map(r => r.role)
+      }));
+
+      setUsers(usersWithRoles);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast({
+        title: "加载失败",
+        description: "无法加载用户列表",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleAddRole = async (userId: string, role: AppRole) => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "角色已存在",
+            description: "该用户已拥有此角色",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
+
+      toast({
+        title: "角色已添加",
+        description: `已成功添加 ${getRoleLabel(role)} 角色`
+      });
+
+      fetchUsers();
+    } catch (error) {
+      console.error('Error adding role:', error);
+      toast({
+        title: "添加失败",
+        description: "无法添加角色",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRemoveRole = async (userId: string, role: AppRole) => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('role', role);
+
+      if (error) throw error;
+
+      toast({
+        title: "角色已移除",
+        description: `已成功移除 ${getRoleLabel(role)} 角色`
+      });
+
+      fetchUsers();
+    } catch (error) {
+      console.error('Error removing role:', error);
+      toast({
+        title: "移除失败",
+        description: "无法移除角色",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getRoleLabel = (role: AppRole) => {
+    const roleMap: Record<AppRole, string> = {
+      admin: '管理员',
+      moderator: '版主',
+      user: '用户'
+    };
+    return roleMap[role] || role;
+  };
+
+  const getRoleVariant = (role: AppRole): "default" | "secondary" | "destructive" | "outline" => {
+    const variantMap: Record<AppRole, "default" | "secondary" | "destructive" | "outline"> = {
+      admin: 'destructive',
+      moderator: 'secondary',
+      user: 'outline'
+    };
+    return variantMap[role] || 'default';
   };
 
   const handleSaveConfig = async () => {
@@ -265,10 +402,14 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="reservations" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
             <TabsTrigger value="reservations" className="gap-2">
               <Building2 className="h-4 w-4" />
               企业预约
+            </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <Shield className="h-4 w-4" />
+              用户角色
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="h-4 w-4" />
@@ -353,6 +494,108 @@ const Admin = () => {
                                     标记完成
                                   </Button>
                                 )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    用户角色管理
+                  </CardTitle>
+                  <CardDescription>
+                    共 {users.length} 个用户
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={fetchUsers} disabled={loadingUsers}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loadingUsers ? 'animate-spin' : ''}`} />
+                  刷新
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingUsers ? (
+                  <div className="flex justify-center py-8">
+                    <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : users.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    暂无用户
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>用户</TableHead>
+                          <TableHead>邮箱</TableHead>
+                          <TableHead>当前角色</TableHead>
+                          <TableHead>注册时间</TableHead>
+                          <TableHead>添加角色</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {users.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell className="font-medium">
+                              {user.display_name || '未设置'}
+                            </TableCell>
+                            <TableCell>{user.email || '-'}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {user.roles.length === 0 ? (
+                                  <span className="text-muted-foreground text-sm">无角色</span>
+                                ) : (
+                                  user.roles.map((role) => (
+                                    <Badge 
+                                      key={role} 
+                                      variant={getRoleVariant(role)}
+                                      className="cursor-pointer hover:opacity-80 gap-1"
+                                      onClick={() => handleRemoveRole(user.id, role)}
+                                    >
+                                      {getRoleLabel(role)}
+                                      <Trash2 className="h-3 w-3" />
+                                    </Badge>
+                                  ))
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {formatDate(user.created_at)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2 items-center">
+                                <Select
+                                  value={selectedRole}
+                                  onValueChange={(value) => setSelectedRole(value as AppRole)}
+                                >
+                                  <SelectTrigger className="w-[100px]">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="admin">管理员</SelectItem>
+                                    <SelectItem value="moderator">版主</SelectItem>
+                                    <SelectItem value="user">用户</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleAddRole(user.id, selectedRole)}
+                                  disabled={user.roles.includes(selectedRole)}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
