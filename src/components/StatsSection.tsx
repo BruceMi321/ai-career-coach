@@ -1,4 +1,6 @@
 import { useCountAnimation } from "@/hooks/useCountAnimation";
+import { useLanguage } from "@/hooks/useLanguage";
+import ScrollReveal from "./ScrollReveal";
 
 const StatItem = ({ value, suffix, label }: { value: number; suffix: string; label: string }) => {
   const { count, ref } = useCountAnimation({ end: value, duration: 1500 });
@@ -16,24 +18,28 @@ const StatItem = ({ value, suffix, label }: { value: number; suffix: string; lab
 };
 
 const StatsSection = () => {
+  const { t } = useLanguage();
+
   const stats = [
-    { value: 28, suffix: "%", label: "平均面试邀请提升率" },
-    { value: 30, suffix: "秒", label: "快速生成分析报告" },
-    { value: 92, suffix: "%", label: "用户推荐率" },
+    { value: 28, suffix: "%", label: t("平均面试邀请提升率", "Interview Rate Increase") },
+    { value: 30, suffix: t("秒", "s"), label: t("快速生成分析报告", "Fast Report Generation") },
+    { value: 92, suffix: "%", label: t("用户推荐率", "User Recommendation") },
   ];
 
   return (
     <section className="py-20 lg:py-28 border-y border-border">
       <div className="container px-4">
-        <div className="text-center mb-16">
-          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground font-medium mb-4">
-            数据见证效果
-          </p>
-          <h2 className="text-3xl lg:text-4xl font-serif font-medium mb-4">
-            真实的用户成果
-          </h2>
-          <div className="w-16 h-px bg-primary mx-auto mt-6" />
-        </div>
+        <ScrollReveal animation="fade-up">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground font-medium mb-4">
+              {t("数据见证效果", "Results That Speak")}
+            </p>
+            <h2 className="text-3xl lg:text-4xl font-serif font-medium mb-4">
+              {t("真实的用户成果", "Real User Outcomes")}
+            </h2>
+            <div className="w-16 h-px bg-primary mx-auto mt-6" />
+          </div>
+        </ScrollReveal>
         
         <div className="grid md:grid-cols-3 max-w-4xl mx-auto divide-y md:divide-y-0 md:divide-x divide-border">
           {stats.map((stat, index) => (

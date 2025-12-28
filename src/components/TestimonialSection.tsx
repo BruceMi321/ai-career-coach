@@ -1,5 +1,10 @@
+import { useLanguage } from "@/hooks/useLanguage";
+import ScrollReveal from "./ScrollReveal";
+
 const TestimonialSection = () => {
-  const testimonials = [
+  const { t, language } = useLanguage();
+
+  const testimonials = language === "zh" ? [
     {
       quote: "使用这个工具后，我的简历通过率提升了很多。AI 给出的建议非常具体，让我知道该如何改进。",
       author: "张先生",
@@ -18,37 +23,57 @@ const TestimonialSection = () => {
       role: "市场总监",
       company: "某上市公司",
     },
+  ] : [
+    {
+      quote: "After using this tool, my resume pass rate improved significantly. The AI suggestions were very specific.",
+      author: "John Z.",
+      role: "Software Engineer",
+      company: "Tech Giant",
+    },
+    {
+      quote: "As a fresh graduate, I knew nothing about job hunting. This platform helped me land my dream offer.",
+      author: "Sarah L.",
+      role: "Product Manager",
+      company: "Tech Startup",
+    },
+    {
+      quote: "The expert consultation service gave me a much clearer vision of my career path. Highly recommended!",
+      author: "Michael W.",
+      role: "Marketing Director",
+      company: "Public Company",
+    },
   ];
 
   return (
     <section className="py-20 lg:py-32 bg-muted/30">
       <div className="container px-4">
-        <div className="text-center mb-16">
-          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground font-medium mb-4">
-            用户反馈
-          </p>
-          <h2 className="text-3xl lg:text-4xl font-serif font-medium mb-4">
-            真实的成功案例
-          </h2>
-          <div className="w-16 h-px bg-primary mx-auto mt-6" />
-        </div>
+        <ScrollReveal animation="fade-up">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground font-medium mb-4">
+              {t("用户反馈", "Testimonials")}
+            </p>
+            <h2 className="text-3xl lg:text-4xl font-serif font-medium mb-4">
+              {t("真实的成功案例", "Real Success Stories")}
+            </h2>
+            <div className="w-16 h-px bg-primary mx-auto mt-6" />
+          </div>
+        </ScrollReveal>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className="relative p-8 bg-background border-t-2 border-primary/20 hover:border-primary transition-colors"
-            >
-              <p className="text-foreground mb-8 leading-relaxed text-lg italic">
-                "{testimonial.quote}"
-              </p>
-              <div className="border-t border-border pt-6">
-                <p className="font-medium text-foreground">{testimonial.author}</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {testimonial.role}，{testimonial.company}
+            <ScrollReveal key={index} animation="fade-up" delay={index * 100}>
+              <div className="relative p-8 bg-background border-t-2 border-primary/20 hover:border-primary transition-colors h-full flex flex-col">
+                <p className="text-foreground mb-8 leading-relaxed text-lg italic flex-1">
+                  "{testimonial.quote}"
                 </p>
+                <div className="border-t border-border pt-6">
+                  <p className="font-medium text-foreground">{testimonial.author}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {testimonial.role}{language === "zh" ? "，" : ", "}{testimonial.company}
+                  </p>
+                </div>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
