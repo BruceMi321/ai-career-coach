@@ -18,16 +18,22 @@ const Index = () => {
         <TrustBadges />
         <FeatureSection />
         <StatsSection />
-        <section id="resume-analyzer" className="container px-4 py-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              立即开始分析
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              输入您的简历和目标职位描述，获取专业的 AI 分析报告
-            </p>
+        <section id="resume-analyzer" className="py-20 lg:py-32 bg-muted/20">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground font-medium mb-4">
+                开始使用
+              </p>
+              <h2 className="text-3xl lg:text-4xl font-serif font-medium mb-4">
+                立即开始分析
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+                输入您的简历和目标职位描述，获取专业的 AI 分析报告
+              </p>
+              <div className="w-16 h-px bg-primary mx-auto mt-6" />
+            </div>
+            <ResumeAnalyzer />
           </div>
-          <ResumeAnalyzer />
         </section>
         <ServicesGrid />
         <TestimonialSection />
