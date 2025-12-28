@@ -3,10 +3,12 @@ import { createPortal } from "react-dom";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { X, ChevronLeft, ChevronRight, Sparkles, MessageSquare, Settings, Target, Rocket } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Sparkles, MessageSquare, Settings, Target, Rocket, Trophy, PartyPopper } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const TOUR_STORAGE_KEY = "onboarding-tour-completed";
+const FIRST_VISIT_KEY = "first-visit-handled";
 
 interface TourStep {
   target: string;
@@ -75,21 +77,113 @@ const tourSteps: TourStep[] = [
   },
 ];
 
+// Confetti component for celebration
+const Confetti = ({ onComplete }: { onComplete: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 3000);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 0.5,
+    duration: 2 + Math.random() * 2,
+    color: ['hsl(var(--primary))', 'hsl(var(--accent))', '#FFD700', '#FF6B6B', '#4ECDC4'][Math.floor(Math.random() * 5)],
+    size: 6 + Math.random() * 8,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[10000] overflow-hidden">
+      {confettiPieces.map((piece) => (
+        <div
+          key={piece.id}
+          className="absolute animate-confetti"
+          style={{
+            left: `${piece.left}%`,
+            top: '-20px',
+            width: `${piece.size}px`,
+            height: `${piece.size}px`,
+            backgroundColor: piece.color,
+            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            animationDelay: `${piece.delay}s`,
+            animationDuration: `${piece.duration}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Celebration modal
+const CelebrationModal = ({ onClose }: { onClose: () => void }) => {
+  const { t } = useLanguage();
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+      {showConfetti && <Confetti onComplete={() => setShowConfetti(false)} />}
+      <Card className="relative z-10 w-80 p-6 text-center animate-celebration-bounce shadow-2xl">
+        <div className="space-y-4">
+          <div className="relative mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center animate-pulse-glow">
+            <Trophy className="h-10 w-10 text-primary animate-bounce-slow" />
+            <PartyPopper className="absolute -top-2 -right-2 h-6 w-6 text-accent animate-wiggle" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {t("恭喜完成导览！", "Tour Complete!")}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              {t(
+                "您已了解所有核心功能，现在开始提升您的求职竞争力吧！",
+                "You've learned all core features. Start boosting your job search now!"
+              )}
+            </p>
+          </div>
+          <Button onClick={onClose} className="w-full gap-2 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <Sparkles className="h-4 w-4" />
+            {t("开始使用", "Get Started")}
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 interface OnboardingTourProps {
   externalOpen?: boolean;
   onExternalOpenChange?: (open: boolean) => void;
+  autoStart?: boolean;
 }
 
-export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: OnboardingTourProps) => {
+export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart = false }: OnboardingTourProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [stepKey, setStepKey] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
+  const { toast } = useToast();
 
   const isControlled = externalOpen !== undefined;
   const open = isControlled ? externalOpen : internalOpen;
   const setOpen = isControlled ? onExternalOpenChange! : setInternalOpen;
+
+  // Auto-start tour for first-time visitors
+  useEffect(() => {
+    if (autoStart && !isControlled) {
+      const hasCompletedTour = localStorage.getItem(TOUR_STORAGE_KEY);
+      const firstVisitHandled = localStorage.getItem(FIRST_VISIT_KEY);
+      
+      if (!hasCompletedTour && !firstVisitHandled) {
+        localStorage.setItem(FIRST_VISIT_KEY, "true");
+        const timer = setTimeout(() => setInternalOpen(true), 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [autoStart, isControlled]);
 
   const updateTargetRect = useCallback(() => {
     const step = tourSteps[currentStep];
@@ -138,6 +232,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
   const handleNext = () => {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setStepKey(prev => prev + 1);
     } else {
       handleComplete();
     }
@@ -146,6 +241,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
   const handlePrev = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      setStepKey(prev => prev + 1);
     }
   };
 
@@ -153,13 +249,31 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
     localStorage.setItem(TOUR_STORAGE_KEY, "true");
     setCurrentStep(0);
     setOpen(false);
+    toast({
+      title: t("已跳过导览", "Tour Skipped"),
+      description: t("您可以在菜单中随时重新查看", "You can restart it from the menu anytime"),
+    });
   };
 
   const handleComplete = () => {
     localStorage.setItem(TOUR_STORAGE_KEY, "true");
     setCurrentStep(0);
     setOpen(false);
+    setShowCelebration(true);
   };
+
+  const handleCelebrationClose = () => {
+    setShowCelebration(false);
+    // Scroll to resume analyzer section
+    const element = document.getElementById("resume-analyzer");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  if (showCelebration) {
+    return createPortal(<CelebrationModal onClose={handleCelebrationClose} />, document.body);
+  }
 
   if (!open) return null;
 
@@ -177,7 +291,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
     }
 
     const padding = 16;
-    const cardHeight = 200;
+    const cardHeight = 220;
     const cardWidth = 320;
 
     let top = 0;
@@ -222,26 +336,51 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
   const overlay = (
     <div className="fixed inset-0 z-[9998]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={handleSkip} />
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in" onClick={handleSkip} />
       
-      {/* Spotlight hole for target */}
+      {/* Spotlight hole for target with pulse animation */}
       {targetRect && (
-        <div
-          className="absolute border-2 border-primary rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] transition-all duration-300"
-          style={{
-            top: targetRect.top - 4,
-            left: targetRect.left - 4,
-            width: targetRect.width + 8,
-            height: targetRect.height + 8,
-          }}
-        />
+        <>
+          {/* Outer glow ring */}
+          <div
+            className="absolute rounded-lg animate-spotlight-pulse pointer-events-none"
+            style={{
+              top: targetRect.top - 12,
+              left: targetRect.left - 12,
+              width: targetRect.width + 24,
+              height: targetRect.height + 24,
+              boxShadow: '0 0 0 4px hsl(var(--primary) / 0.3), 0 0 30px 10px hsl(var(--primary) / 0.2)',
+            }}
+          />
+          {/* Main spotlight */}
+          <div
+            className="absolute border-2 border-primary rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] transition-all duration-500 ease-out animate-spotlight-appear"
+            style={{
+              top: targetRect.top - 4,
+              left: targetRect.left - 4,
+              width: targetRect.width + 8,
+              height: targetRect.height + 8,
+            }}
+          />
+          {/* Inner highlight */}
+          <div
+            className="absolute rounded-lg bg-primary/5 pointer-events-none animate-highlight-shimmer"
+            style={{
+              top: targetRect.top,
+              left: targetRect.left,
+              width: targetRect.width,
+              height: targetRect.height,
+            }}
+          />
+        </>
       )}
 
       {/* Tour Card */}
       <Card
         ref={cardRef}
+        key={stepKey}
         className={cn(
-          "z-[9999] w-80 p-4 shadow-lg animate-scale-in",
+          "z-[9999] w-80 p-4 shadow-2xl border-primary/20 animate-card-enter",
           !targetRect && "max-w-sm"
         )}
         style={getCardPosition()}
@@ -250,7 +389,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center animate-icon-bounce">
                 <StepIcon className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -265,7 +404,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 -mr-2 -mt-1"
+              className="h-8 w-8 -mr-2 -mt-1 hover:bg-destructive/10 hover:text-destructive"
               onClick={handleSkip}
             >
               <X className="h-4 w-4" />
@@ -273,20 +412,33 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
           </div>
 
           {/* Content */}
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed animate-fade-in" style={{ animationDelay: '0.1s' }}>
             {t(step.content, step.contentEn)}
           </p>
+
+          {/* Progress bar */}
+          <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${((currentStep + 1) / tourSteps.length) * 100}%` }}
+            />
+          </div>
 
           {/* Progress dots */}
           <div className="flex justify-center gap-1.5">
             {tourSteps.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentStep(index)}
+                onClick={() => {
+                  setCurrentStep(index);
+                  setStepKey(prev => prev + 1);
+                }}
                 className={cn(
-                  "w-2 h-2 rounded-full transition-all",
+                  "w-2 h-2 rounded-full transition-all duration-300",
                   index === currentStep
-                    ? "bg-primary w-4"
+                    ? "bg-primary w-6 shadow-[0_0_8px_2px_hsl(var(--primary)/0.4)]"
+                    : index < currentStep
+                    ? "bg-primary/50"
                     : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
                 )}
               />
@@ -305,9 +457,12 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
               <ChevronLeft className="h-4 w-4" />
               {t("上一步", "Previous")}
             </Button>
-            <Button size="sm" onClick={handleNext} className="gap-1">
+            <Button size="sm" onClick={handleNext} className="gap-1 min-w-[100px]">
               {currentStep === tourSteps.length - 1 ? (
-                t("完成", "Finish")
+                <>
+                  <Trophy className="h-4 w-4" />
+                  {t("完成", "Finish")}
+                </>
               ) : (
                 <>
                   {t("下一步", "Next")}
@@ -326,6 +481,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange }: Onboardin
 
 export const resetOnboardingTour = () => {
   localStorage.removeItem(TOUR_STORAGE_KEY);
+  localStorage.removeItem(FIRST_VISIT_KEY);
 };
 
 export const hasCompletedTour = () => {
