@@ -169,7 +169,16 @@ export const ApiConfigProvider = ({ children }: { children: ReactNode }) => {
 export const useApiConfig = () => {
   const context = useContext(ApiConfigContext);
   if (context === undefined) {
-    throw new Error("useApiConfig must be used within an ApiConfigProvider");
+    // Fallback to prevent blank screen if provider is missing for any reason.
+    console.warn("useApiConfig used outside ApiConfigProvider");
+    return {
+      configs: [],
+      activeConfig: null,
+      addConfig: () => {},
+      removeConfig: () => {},
+      setActiveProvider: () => {},
+      hasApiConfig: false,
+    };
   }
   return context;
 };
