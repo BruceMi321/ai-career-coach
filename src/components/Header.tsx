@@ -16,6 +16,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import ApiSettingsDialog from "./ApiSettingsDialog";
 
 const GUIDE_STORAGE_KEY = "header-guide-seen";
@@ -46,6 +52,7 @@ const Header = () => {
       element.scrollIntoView({ behavior: "smooth" });
       window.dispatchEvent(new CustomEvent("switchResumeTab", { detail: tab }));
     }
+    setMobileMenuOpen(false);
   };
 
   const navItems = [
@@ -65,65 +72,8 @@ const Header = () => {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation - Simplified */}
         <nav className="hidden lg:flex items-center gap-4 mx-8">
-          <Popover open={showGuide} onOpenChange={setShowGuide}>
-            <PopoverTrigger asChild>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    scrollToFeature("analyze");
-                    dismissGuide();
-                  }}
-                  className="gap-1.5 text-muted-foreground hover:text-foreground"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  {t("简历分析", "Resume")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    scrollToFeature("interview");
-                    dismissGuide();
-                  }}
-                  className="gap-1.5 text-muted-foreground hover:text-foreground"
-                >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  {t("模拟面试", "Interview")}
-                </Button>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-64 p-3" 
-              side="bottom" 
-              align="start"
-              onPointerDownOutside={dismissGuide}
-            >
-              <div className="space-y-2">
-                <p className="text-sm font-medium">
-                  {t("✨ 快捷入口", "✨ Quick Access")}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {t(
-                    "点击这里可以直接跳转到简历分析或模拟面试功能，无需滚动页面。",
-                    "Click here to jump directly to Resume Analysis or Mock Interview without scrolling."
-                  )}
-                </p>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="w-full text-xs h-7"
-                  onClick={dismissGuide}
-                >
-                  {t("知道了", "Got it")}
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          <div className="w-px h-4 bg-border" />
           {navItems.map((item) => (
             <Link
               key={item.label}
@@ -153,6 +103,82 @@ const Header = () => {
 
         {/* Right side actions */}
         <div className="flex items-center gap-1">
+          {/* Quick Access Buttons - Compact icons with tooltips */}
+          <TooltipProvider delayDuration={300}>
+            <div className="hidden sm:flex items-center">
+              <Popover open={showGuide} onOpenChange={setShowGuide}>
+                <PopoverTrigger asChild>
+                  <div className="flex items-center">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            scrollToFeature("analyze");
+                            dismissGuide();
+                          }}
+                          className="h-8 w-8 px-0 text-muted-foreground hover:text-foreground"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        <p>{t("简历分析", "Resume Analysis")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            scrollToFeature("interview");
+                            dismissGuide();
+                          }}
+                          className="h-8 w-8 px-0 text-muted-foreground hover:text-foreground"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        <p>{t("模拟面试", "Mock Interview")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-64 p-3" 
+                  side="bottom" 
+                  align="center"
+                  onPointerDownOutside={dismissGuide}
+                >
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">
+                      {t("✨ 快捷入口", "✨ Quick Access")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {t(
+                        "点击这里可以直接跳转到简历分析或模拟面试功能，无需滚动页面。",
+                        "Click here to jump directly to Resume Analysis or Mock Interview without scrolling."
+                      )}
+                    </p>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full text-xs h-7"
+                      onClick={dismissGuide}
+                    >
+                      {t("知道了", "Got it")}
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </TooltipProvider>
+
+          <div className="hidden sm:block w-px h-5 bg-border mx-1" />
+
           {/* Language Toggle - Desktop */}
           <div className="hidden sm:block">
             <DropdownMenu>
@@ -242,6 +268,27 @@ const Header = () => {
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-border bg-background">
           <nav className="container px-4 py-4 space-y-1">
+            {/* Quick access buttons at top */}
+            <div className="flex gap-2 pb-3 border-b border-border mb-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 gap-1.5 h-9"
+                onClick={() => scrollToFeature("analyze")}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                {t("简历分析", "Resume")}
+              </Button>
+              <Button
+                size="sm"
+                className="flex-1 gap-1.5 h-9"
+                onClick={() => scrollToFeature("interview")}
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+                {t("面试", "Interview")}
+              </Button>
+            </div>
+
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -282,33 +329,6 @@ const Header = () => {
                   </Link>
                 </>
               )}
-              
-            {/* Quick access buttons */}
-              <div className="flex gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-1.5"
-                  onClick={() => {
-                    scrollToFeature("analyze");
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  {t("简历分析", "Resume")}
-                </Button>
-                <Button
-                  size="sm"
-                  className="flex-1 gap-1.5"
-                  onClick={() => {
-                    scrollToFeature("interview");
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  {t("面试", "Interview")}
-                </Button>
-              </div>
 
               <div className="flex items-center justify-between pt-2">
                 <span className="text-xs text-muted-foreground">{t("语言", "Language")}</span>
