@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useApiConfig, API_PROVIDERS, ApiConfig } from "@/hooks/useApiConfig";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Settings, Plus, Trash2, Check, Eye, EyeOff, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,6 +31,7 @@ interface ApiSettingsDialogProps {
 const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   const { configs, activeConfig, addConfig, removeConfig, setActiveProvider } = useApiConfig();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showApiKey, setShowApiKey] = useState<Record<string, boolean>>({});
@@ -53,7 +55,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   const handleAddConfig = () => {
     if (!apiKey.trim()) {
       toast({
-        title: "请输入API密钥",
+        title: t("请输入API密钥", "Please enter API key"),
         variant: "destructive",
       });
       return;
@@ -61,7 +63,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
 
     if (selectedProviderInfo?.requiresBaseUrl && !baseUrl.trim()) {
       toast({
-        title: "请输入API端点地址",
+        title: t("请输入API端点地址", "Please enter API endpoint"),
         variant: "destructive",
       });
       return;
@@ -75,8 +77,8 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
     });
 
     toast({
-      title: "API配置已保存",
-      description: `${selectedProviderInfo?.name} 配置成功`,
+      title: t("API配置已保存", "API Configuration Saved"),
+      description: `${selectedProviderInfo?.name} ${t("配置成功", "configured successfully")}`,
     });
 
     resetForm();
@@ -85,7 +87,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   const handleRemoveConfig = (providerId: string) => {
     removeConfig(providerId);
     toast({
-      title: "API配置已删除",
+      title: t("API配置已删除", "API Configuration Removed"),
     });
   };
 
@@ -109,15 +111,18 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
         {trigger || (
           <Button variant="outline" size="sm" className="gap-2">
             <Settings className="h-4 w-4" />
-            API 设置
+            {t("API 设置", "API Settings")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>AI API 配置</DialogTitle>
+          <DialogTitle>{t("AI API 配置", "AI API Configuration")}</DialogTitle>
           <DialogDescription>
-            配置您的AI服务API密钥。支持多种AI服务商，可随时切换。
+            {t(
+              "配置您的AI服务API密钥。支持多种AI服务商，可随时切换。",
+              "Configure your AI API keys. Multiple providers supported, switch anytime."
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +130,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
           {/* Existing Configs */}
           {configs.length > 0 && (
             <div className="space-y-3">
-              <Label className="text-base">已配置的服务</Label>
+              <Label className="text-base">{t("已配置的服务", "Configured Services")}</Label>
               {configs.map((config) => {
                 const providerInfo = API_PROVIDERS.find((p) => p.id === config.provider);
                 const isActive = activeConfig?.provider === config.provider;
@@ -143,7 +148,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                               {isActive && (
                                 <Badge variant="secondary" className="text-xs">
                                   <Check className="h-3 w-3 mr-1" />
-                                  当前使用
+                                  {t("当前使用", "Active")}
                                 </Badge>
                               )}
                             </div>
@@ -168,7 +173,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                             </div>
                             {config.model && (
                               <div className="text-xs text-muted-foreground mt-1">
-                                模型: {config.model}
+                                {t("模型", "Model")}: {config.model}
                               </div>
                             )}
                           </div>
@@ -180,7 +185,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                               size="sm"
                               onClick={() => setActiveProvider(config.provider)}
                             >
-                              使用此服务
+                              {t("使用此服务", "Use This")}
                             </Button>
                           )}
                           <Button
@@ -211,7 +216,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
               }}
             >
               <Plus className="h-4 w-4" />
-              添加 API 配置
+              {t("添加 API 配置", "Add API Configuration")}
             </Button>
           )}
 
@@ -219,14 +224,14 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
             <Card>
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-base">添加新的 API 配置</Label>
+                  <Label className="text-base">{t("添加新的 API 配置", "Add New API Configuration")}</Label>
                   <Button variant="ghost" size="sm" onClick={resetForm}>
-                    取消
+                    {t("取消", "Cancel")}
                   </Button>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>选择服务商</Label>
+                  <Label>{t("选择服务商", "Select Provider")}</Label>
                   <Select value={provider} onValueChange={(v) => setProvider(v as ApiConfig["provider"])}>
                     <SelectTrigger>
                       <SelectValue />
@@ -246,15 +251,18 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>API 密钥</Label>
+                  <Label>{t("API 密钥", "API Key")}</Label>
                   <Input
                     type="password"
-                    placeholder={`请输入您的 ${selectedProviderInfo?.name} API 密钥`}
+                    placeholder={t(
+                      `请输入您的 ${selectedProviderInfo?.name} API 密钥`,
+                      `Enter your ${selectedProviderInfo?.name} API key`
+                    )}
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    API密钥仅保存在您的浏览器本地
+                    {t("API密钥仅保存在您的浏览器本地", "API key is stored locally in your browser")}
                     {selectedProviderInfo && (
                       <a
                         href={getApiKeyUrl(provider)}
@@ -262,7 +270,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-primary hover:underline"
                       >
-                        获取密钥
+                        {t("获取密钥", "Get Key")}
                         <ExternalLink className="h-3 w-3 ml-0.5" />
                       </a>
                     )}
@@ -271,9 +279,12 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
 
                 {selectedProviderInfo?.requiresBaseUrl && (
                   <div className="space-y-2">
-                    <Label>API 端点地址</Label>
+                    <Label>{t("API 端点地址", "API Endpoint")}</Label>
                     <Input
-                      placeholder="例如: https://your-resource.openai.azure.com"
+                      placeholder={t(
+                        "例如: https://your-resource.openai.azure.com",
+                        "e.g., https://your-resource.openai.azure.com"
+                      )}
                       value={baseUrl}
                       onChange={(e) => setBaseUrl(e.target.value)}
                     />
@@ -281,7 +292,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                 )}
 
                 <div className="space-y-2">
-                  <Label>模型（可选）</Label>
+                  <Label>{t("模型（可选）", "Model (Optional)")}</Label>
                   <Select value={model || selectedProviderInfo?.defaultModel} onValueChange={setModel}>
                     <SelectTrigger>
                       <SelectValue />
@@ -298,7 +309,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                 </div>
 
                 <Button onClick={handleAddConfig} className="w-full">
-                  保存配置
+                  {t("保存配置", "Save Configuration")}
                 </Button>
               </CardContent>
             </Card>
@@ -307,8 +318,8 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
           {configs.length === 0 && !showAddForm && (
             <div className="text-center py-8 text-muted-foreground">
               <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>尚未配置任何 API</p>
-              <p className="text-sm">请添加至少一个 AI 服务 API 以使用分析功能</p>
+              <p>{t("尚未配置任何 API", "No API configured yet")}</p>
+              <p className="text-sm">{t("请添加至少一个 AI 服务 API 以使用分析功能", "Add at least one AI API to use analysis features")}</p>
             </div>
           )}
         </div>
