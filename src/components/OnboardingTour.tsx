@@ -429,7 +429,7 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
         ref={cardRef}
         key={stepKey}
         className={cn(
-          "z-[9999] w-80 p-4 shadow-2xl border-primary/20 animate-card-enter",
+          "z-[9999] w-80 p-4 shadow-2xl border-primary/20 animate-card-enter pointer-events-auto",
           !targetRect && "max-w-sm"
         )}
         style={getCardPosition()}
