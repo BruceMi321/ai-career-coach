@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +48,17 @@ const ResumeAnalyzer = () => {
   const { user } = useAuth();
   const { activeConfig, hasApiConfig } = useApiConfig();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    const handleTabSwitch = (event: CustomEvent<"analyze" | "interview">) => {
+      setActiveTab(event.detail);
+    };
+
+    window.addEventListener("switchResumeTab", handleTabSwitch as EventListener);
+    return () => {
+      window.removeEventListener("switchResumeTab", handleTabSwitch as EventListener);
+    };
+  }, []);
 
   const handleAnalyze = async () => {
     if (!resume.trim() || !jobDescription.trim()) {

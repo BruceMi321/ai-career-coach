@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X } from "lucide-react";
+import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -19,9 +19,15 @@ const Header = () => {
   const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const scrollToFeature = (tab: "analyze" | "interview") => {
+    const element = document.getElementById("resume-analyzer");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      window.dispatchEvent(new CustomEvent("switchResumeTab", { detail: tab }));
+    }
+  };
+
   const navItems = [
-    { label: t("简历分析", "Resume"), href: "/" },
-    { label: t("模拟面试", "Interview"), href: "/" },
     { label: t("使用指南", "Guide"), href: "#" },
     { label: t("价格", "Pricing"), href: "#" },
   ];
@@ -39,7 +45,26 @@ const Header = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-6 mx-8">
+        <nav className="hidden lg:flex items-center gap-4 mx-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => scrollToFeature("analyze")}
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {t("简历分析", "Resume")}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => scrollToFeature("interview")}
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            {t("模拟面试", "Interview")}
+          </Button>
+          <div className="w-px h-4 bg-border" />
           {navItems.map((item) => (
             <Link
               key={item.label}
@@ -199,6 +224,33 @@ const Header = () => {
                 </>
               )}
               
+            {/* Quick access buttons */}
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-1.5"
+                  onClick={() => {
+                    scrollToFeature("analyze");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {t("简历分析", "Resume")}
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1 gap-1.5"
+                  onClick={() => {
+                    scrollToFeature("interview");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  {t("面试", "Interview")}
+                </Button>
+              </div>
+
               <div className="flex items-center justify-between pt-2">
                 <span className="text-xs text-muted-foreground">{t("语言", "Language")}</span>
                 <div className="flex gap-2">
