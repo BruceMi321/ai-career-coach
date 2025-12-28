@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useApiConfig, useApiProviders, ApiConfig } from "@/hooks/useApiConfig";
+import { useApiConfig, API_PROVIDERS_DATA, ApiConfig } from "@/hooks/useApiConfig";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Settings, Plus, Trash2, Check, Eye, EyeOff, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -30,9 +30,19 @@ interface ApiSettingsDialogProps {
 
 const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   const { configs, activeConfig, addConfig, removeConfig, setActiveProvider } = useApiConfig();
-  const apiProviders = useApiProviders();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  
+  // Get localized providers
+  const apiProviders = API_PROVIDERS_DATA.map(provider => ({
+    id: provider.id,
+    name: provider.name,
+    description: language === "zh" ? provider.descriptionZh : provider.descriptionEn,
+    baseUrl: provider.baseUrl,
+    defaultModel: provider.defaultModel,
+    models: provider.models,
+    requiresBaseUrl: provider.requiresBaseUrl,
+  }));
   const [open, setOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showApiKey, setShowApiKey] = useState<Record<string, boolean>>({});

@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useLanguage } from "@/hooks/useLanguage";
 
 export interface ApiConfig {
   provider: "openai" | "gemini" | "claude" | "azure" | "openrouter";
@@ -8,7 +7,7 @@ export interface ApiConfig {
   model?: string;
 }
 
-interface ApiProviderInfo {
+export interface ApiProviderInfo {
   id: "openai" | "gemini" | "claude" | "azure" | "openrouter";
   name: string;
   descriptionZh: string;
@@ -19,7 +18,7 @@ interface ApiProviderInfo {
   requiresBaseUrl?: boolean;
 }
 
-const API_PROVIDERS_DATA: ApiProviderInfo[] = [
+export const API_PROVIDERS_DATA: ApiProviderInfo[] = [
   {
     id: "openai",
     name: "OpenAI",
@@ -67,21 +66,6 @@ const API_PROVIDERS_DATA: ApiProviderInfo[] = [
     models: ["openai/gpt-4o", "openai/gpt-4o-mini", "anthropic/claude-3.5-sonnet", "google/gemini-pro"],
   },
 ];
-
-// Helper hook to get localized API providers
-export const useApiProviders = () => {
-  const { language } = useLanguage();
-  
-  return API_PROVIDERS_DATA.map(provider => ({
-    id: provider.id,
-    name: provider.name,
-    description: language === "zh" ? provider.descriptionZh : provider.descriptionEn,
-    baseUrl: provider.baseUrl,
-    defaultModel: provider.defaultModel,
-    models: provider.models,
-    requiresBaseUrl: provider.requiresBaseUrl,
-  }));
-};
 
 // Keep backward compatible export
 export const API_PROVIDERS = API_PROVIDERS_DATA.map(provider => ({
