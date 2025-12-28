@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle, RotateCcw } from "lucide-react";
+import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle, RotateCcw, Navigation } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import ApiSettingsDialog from "./ApiSettingsDialog";
 import WelcomeDialog, { resetWelcomeDialog } from "./WelcomeDialog";
+import OnboardingTour, { resetOnboardingTour } from "./OnboardingTour";
 
 const GUIDE_STORAGE_KEY = "header-guide-seen";
 
@@ -35,6 +36,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+  const [showOnboardingTour, setShowOnboardingTour] = useState(false);
 
   useEffect(() => {
     const hasSeenGuide = localStorage.getItem(GUIDE_STORAGE_KEY);
@@ -42,6 +44,15 @@ const Header = () => {
       const timer = setTimeout(() => setShowGuide(true), 1000);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  // Listen for tour start event from WelcomeDialog
+  useEffect(() => {
+    const handleStartTour = () => {
+      setShowOnboardingTour(true);
+    };
+    window.addEventListener("startOnboardingTour", handleStartTour);
+    return () => window.removeEventListener("startOnboardingTour", handleStartTour);
   }, []);
 
   const dismissGuide = () => {
@@ -118,6 +129,16 @@ const Header = () => {
                 <RotateCcw className="h-4 w-4" />
                 {t("查看引导", "View Guide")}
               </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  resetOnboardingTour();
+                  setShowOnboardingTour(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Navigation className="h-4 w-4" />
+                {t("功能导览", "Feature Tour")}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
@@ -126,7 +147,7 @@ const Header = () => {
         <div className="flex items-center gap-1">
           {/* Quick Access Buttons - Compact icons with tooltips */}
           <TooltipProvider delayDuration={300}>
-            <div className="hidden sm:flex items-center">
+            <div className="hidden sm:flex items-center" data-tour-step="quick-access">
               <Popover open={showGuide} onOpenChange={setShowGuide}>
                 <PopoverTrigger asChild>
                   <div className="flex items-center">
@@ -238,7 +259,7 @@ const Header = () => {
           <div className="hidden sm:block w-px h-5 bg-border mx-2" />
 
           {/* API Settings - Hidden on mobile */}
-          <div className="hidden sm:block">
+          <div className="hidden sm:block" data-tour-step="api-settings">
             <ApiSettingsDialog />
           </div>
           
@@ -323,6 +344,17 @@ const Header = () => {
                   <RotateCcw className="h-4 w-4" />
                   {t("查看引导", "View Guide")}
                 </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    resetOnboardingTour();
+                    setShowOnboardingTour(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Navigation className="h-4 w-4" />
+                  {t("功能导览", "Feature Tour")}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -333,6 +365,12 @@ const Header = () => {
       <WelcomeDialog 
         externalOpen={showWelcomeDialog} 
         onExternalOpenChange={setShowWelcomeDialog} 
+      />
+
+      {/* Onboarding Tour */}
+      <OnboardingTour
+        externalOpen={showOnboardingTour}
+        onExternalOpenChange={setShowOnboardingTour}
       />
     </header>
   );
