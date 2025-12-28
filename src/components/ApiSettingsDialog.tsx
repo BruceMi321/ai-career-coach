@@ -182,13 +182,13 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
 
         <div className="space-y-6 py-4">
           {/* AI Role Info Collapsible */}
-          <Collapsible>
-            <Card className="border-primary/20 bg-primary/5">
+          <Collapsible className="group">
+            <Card className="border-primary/20 bg-primary/5 overflow-hidden">
               <CollapsibleTrigger asChild>
-                <CardContent className="p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                <CardContent className="p-4 cursor-pointer hover:bg-primary/10 transition-all duration-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Bot className="h-5 w-5 text-primary" />
+                      <Bot className="h-5 w-5 text-primary transition-transform duration-300 group-data-[state=open]:rotate-12" />
                       <div>
                         <span className="font-medium">
                           {language === "zh" ? AI_ROLE_INFO.zh.title : AI_ROLE_INFO.en.title}
@@ -198,18 +198,22 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                         </p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-data-[state=open]:rotate-180" />
                   </div>
                 </CardContent>
               </CollapsibleTrigger>
-              <CollapsibleContent>
+              <CollapsibleContent className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
                 <CardContent className="pt-0 px-4 pb-4 space-y-4">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground animate-fade-in">
                     {language === "zh" ? AI_ROLE_INFO.zh.description : AI_ROLE_INFO.en.description}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {(language === "zh" ? AI_ROLE_INFO.zh.roles : AI_ROLE_INFO.en.roles).map((role, index) => (
-                      <div key={index} className="bg-background rounded-lg p-3 space-y-2">
+                      <div 
+                        key={index} 
+                        className="bg-background rounded-lg p-3 space-y-2 animate-fade-in transition-transform duration-200 hover:scale-[1.02]"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
                         <div className="flex items-center gap-2">
                           <role.icon className="h-4 w-4 text-primary" />
                           <span className="font-medium text-sm">{role.title}</span>
@@ -225,7 +229,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground border-t pt-3">
+                  <p className="text-xs text-muted-foreground border-t pt-3 animate-fade-in" style={{ animationDelay: '200ms' }}>
                     ⚠️ {language === "zh" ? AI_ROLE_INFO.zh.note : AI_ROLE_INFO.en.note}
                   </p>
                 </CardContent>
