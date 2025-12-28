@@ -213,6 +213,31 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
     }
   }, [open, currentStep, updateTargetRect]);
 
+  // Elevate target element z-index during tour
+  useEffect(() => {
+    if (open && targetRect) {
+      const step = tourSteps[currentStep];
+      if (step.target) {
+        const element = document.querySelector(step.target) as HTMLElement;
+        if (element) {
+          const originalPosition = element.style.position;
+          const originalZIndex = element.style.zIndex;
+          const originalPointerEvents = element.style.pointerEvents;
+          
+          element.style.position = 'relative';
+          element.style.zIndex = '10000';
+          element.style.pointerEvents = 'auto';
+          
+          return () => {
+            element.style.position = originalPosition;
+            element.style.zIndex = originalZIndex;
+            element.style.pointerEvents = originalPointerEvents;
+          };
+        }
+      }
+    }
+  }, [open, currentStep, targetRect]);
+
   useEffect(() => {
     if (open) {
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -333,38 +358,60 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
     };
   };
 
+  const spotPadding = 8;
+
   const overlay = (
-    <div className="fixed inset-0 z-[9998]">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in" onClick={handleSkip} />
-      
-      {/* Spotlight hole for target with pulse animation */}
-      {targetRect && (
+    <div className="fixed inset-0 z-[9998] pointer-events-none">
+      {/* 4-block overlay with hole for target */}
+      {targetRect ? (
         <>
-          {/* Outer glow ring */}
+          {/* Top overlay */}
+          <div 
+            className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm pointer-events-auto"
+            style={{ height: Math.max(0, targetRect.top - spotPadding) }}
+            onClick={handleSkip}
+          />
+          {/* Bottom overlay */}
+          <div 
+            className="fixed left-0 right-0 bottom-0 bg-background/80 backdrop-blur-sm pointer-events-auto"
+            style={{ top: targetRect.bottom + spotPadding }}
+            onClick={handleSkip}
+          />
+          {/* Left overlay */}
+          <div 
+            className="fixed left-0 bg-background/80 backdrop-blur-sm pointer-events-auto"
+            style={{ 
+              top: targetRect.top - spotPadding,
+              width: Math.max(0, targetRect.left - spotPadding),
+              height: targetRect.height + spotPadding * 2
+            }}
+            onClick={handleSkip}
+          />
+          {/* Right overlay */}
+          <div 
+            className="fixed right-0 bg-background/80 backdrop-blur-sm pointer-events-auto"
+            style={{ 
+              top: targetRect.top - spotPadding,
+              left: targetRect.right + spotPadding,
+              height: targetRect.height + spotPadding * 2
+            }}
+            onClick={handleSkip}
+          />
+          
+          {/* Spotlight border and glow */}
           <div
-            className="absolute rounded-lg animate-spotlight-pulse pointer-events-none"
+            className="fixed rounded-lg border-2 border-primary animate-spotlight-pulse pointer-events-none"
             style={{
-              top: targetRect.top - 12,
-              left: targetRect.left - 12,
-              width: targetRect.width + 24,
-              height: targetRect.height + 24,
+              top: targetRect.top - spotPadding,
+              left: targetRect.left - spotPadding,
+              width: targetRect.width + spotPadding * 2,
+              height: targetRect.height + spotPadding * 2,
               boxShadow: '0 0 0 4px hsl(var(--primary) / 0.3), 0 0 30px 10px hsl(var(--primary) / 0.2)',
             }}
           />
-          {/* Main spotlight */}
+          {/* Inner shimmer highlight */}
           <div
-            className="absolute border-2 border-primary rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] transition-all duration-500 ease-out animate-spotlight-appear"
-            style={{
-              top: targetRect.top - 4,
-              left: targetRect.left - 4,
-              width: targetRect.width + 8,
-              height: targetRect.height + 8,
-            }}
-          />
-          {/* Inner highlight */}
-          <div
-            className="absolute rounded-lg bg-primary/5 pointer-events-none animate-highlight-shimmer"
+            className="fixed rounded-lg bg-primary/5 pointer-events-none animate-highlight-shimmer"
             style={{
               top: targetRect.top,
               left: targetRect.left,
@@ -373,6 +420,8 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
             }}
           />
         </>
+      ) : (
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm pointer-events-auto" onClick={handleSkip} />
       )}
 
       {/* Tour Card */}
