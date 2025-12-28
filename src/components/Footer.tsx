@@ -1,48 +1,96 @@
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   const footerLinks = {
-    产品: [
-      { label: "简历分析", href: "/" },
-      { label: "模拟面试", href: "/" },
-      { label: "职业规划", href: "/" },
+    [t("产品", "Products")]: [
+      { label: t("简历分析", "Resume Analysis"), href: "/" },
+      { label: t("模拟面试", "Mock Interview"), href: "/" },
+      { label: t("职业规划", "Career Planning"), href: "/" },
     ],
-    服务: [
-      { label: "人工专家咨询", href: "/contact-expert" },
-      { label: "企业服务", href: "/" },
-      { label: "合作伙伴", href: "/" },
+    [t("服务", "Services")]: [
+      { label: t("专家咨询", "Expert Consultation"), href: "/contact-expert" },
+      { label: t("企业服务", "Enterprise"), href: "/" },
+      { label: t("合作伙伴", "Partners"), href: "/" },
     ],
-    资源: [
-      { label: "使用指南", href: "/" },
-      { label: "常见问题", href: "/" },
-      { label: "博客", href: "/" },
+    [t("资源", "Resources")]: [
+      { label: t("使用指南", "Guide"), href: "/" },
+      { label: t("常见问题", "FAQ"), href: "/" },
+      { label: t("博客", "Blog"), href: "/" },
     ],
-    公司: [
-      { label: "关于我们", href: "/" },
-      { label: "联系我们", href: "/contact-expert" },
-      { label: "隐私政策", href: "/" },
+    [t("公司", "Company")]: [
+      { label: t("关于我们", "About"), href: "/" },
+      { label: t("联系我们", "Contact"), href: "/contact-expert" },
+      { label: t("隐私政策", "Privacy"), href: "/" },
     ],
   };
 
   return (
     <footer className="border-t border-border bg-background">
-      <div className="container px-4 py-16 lg:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 lg:gap-12">
+      <div className="container px-4 py-12 lg:py-16">
+        {/* Mobile: Stacked layout */}
+        <div className="lg:hidden space-y-10">
+          {/* Brand - Mobile */}
+          <div className="text-center pb-8 border-b border-border">
+            <Link to="/" className="inline-block mb-4">
+              <span className="text-xl tracking-tight">
+                <span className="font-light">your</span>
+                <span className="font-semibold">way</span>
+                <span className="text-primary">career</span>
+              </span>
+            </Link>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
+              {t("AI 驱动的职业发展平台", "AI-powered career development platform")}
+            </p>
+          </div>
+
+          {/* Links Grid - Mobile */}
+          <div className="grid grid-cols-2 gap-8">
+            {Object.entries(footerLinks).map(([title, links]) => (
+              <div key={title}>
+                <h4 className="text-xs font-medium uppercase tracking-wider text-foreground mb-3">{title}</h4>
+                <ul className="space-y-2">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        to={link.href}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Contact - Mobile */}
+          <div className="text-center pt-8 border-t border-border">
+            <p className="text-sm text-muted-foreground">biz@yourwaycareer.com</p>
+            <p className="text-sm text-muted-foreground">{t("上海", "Shanghai")}</p>
+          </div>
+        </div>
+
+        {/* Desktop: Original layout */}
+        <div className="hidden lg:grid grid-cols-5 gap-12">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
+          <div>
             <Link to="/" className="inline-block mb-6">
               <span className="text-xl tracking-tight">
                 <span className="font-light">your</span>
                 <span className="font-semibold">way</span>
-                <span className="font-light text-primary">career</span>
+                <span className="text-primary">career</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-              AI 驱动的职业发展平台，助您实现职业目标
+              {t("AI 驱动的职业发展平台，助您实现职业目标", "AI-powered career platform to achieve your goals")}
             </p>
             <div className="space-y-1 text-sm text-muted-foreground">
               <p>biz@yourwaycareer.com</p>
-              <p>上海</p>
+              <p>{t("上海", "Shanghai")}</p>
             </div>
           </div>
 
@@ -66,16 +114,17 @@ const Footer = () => {
           ))}
         </div>
 
-        <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2026 yourwaycareer. All rights reserved.
+        {/* Bottom bar */}
+        <div className="border-t border-border mt-10 lg:mt-16 pt-6 lg:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground order-2 sm:order-1">
+            © 2026 yourwaycareer. {t("保留所有权利", "All rights reserved")}.
           </p>
-          <div className="flex gap-8 text-sm text-muted-foreground">
+          <div className="flex gap-6 text-xs text-muted-foreground order-1 sm:order-2">
             <Link to="/" className="hover:text-foreground transition-colors">
-              服务条款
+              {t("服务条款", "Terms")}
             </Link>
             <Link to="/" className="hover:text-foreground transition-colors">
-              隐私政策
+              {t("隐私政策", "Privacy")}
             </Link>
           </div>
         </div>
