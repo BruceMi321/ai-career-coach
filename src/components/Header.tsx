@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -264,7 +265,7 @@ const Header = () => {
                   {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[120px]">
+              <DropdownMenuContent align="end" className="min-w-[120px] animate-fade-in">
                 {navItems.map((item) => (
                   <DropdownMenuItem key={item.label} asChild>
                     <Link 
@@ -275,6 +276,7 @@ const Header = () => {
                     </Link>
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="#" onClick={() => setMobileMenuOpen(false)}>
                     {t("关于我们", "About")}
