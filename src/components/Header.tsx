@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle, RotateCcw, Navigation } from "lucide-react";
+import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle, RotateCcw, Navigation, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAdmin } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
@@ -33,6 +34,7 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { isAdmin } = useAdmin();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
@@ -118,6 +120,14 @@ const Header = () => {
                   {t("帮助中心", "Help")}
                 </Link>
               </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    {t("管理后台", "Admin")}
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => {
@@ -332,6 +342,17 @@ const Header = () => {
                     {t("帮助中心", "Help")}
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        {t("管理后台", "Admin")}
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={() => {
