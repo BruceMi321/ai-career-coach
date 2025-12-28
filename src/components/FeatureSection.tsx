@@ -35,23 +35,26 @@ const FeatureBlock = ({ title, highlight, description, features, imagePosition, 
 
   const visual = (
     <div className="relative">
-      <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/20 to-accent/50 p-6 lg:p-8 flex items-center justify-center">
-        <div className="bg-card rounded-xl shadow-lg p-6 w-full max-w-sm">
+      <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/20 p-6 lg:p-8 flex items-center justify-center">
+        <div className="bg-background rounded-xl shadow-xl border border-border p-6 w-full max-w-sm">
           <div className="space-y-4">
-            <div className="h-3 bg-muted rounded w-3/4" />
+            <div className="h-3 bg-primary/20 rounded w-3/4" />
             <div className="h-3 bg-muted rounded w-1/2" />
-            <div className="h-3 bg-primary/30 rounded w-5/6" />
-            <div className="flex gap-2 mt-4">
-              <div className="h-8 w-8 rounded-full bg-primary/20" />
+            <div className="h-3 bg-primary/40 rounded w-5/6" />
+            <div className="flex gap-3 mt-4">
+              <div className="h-10 w-10 rounded-full bg-primary/30 flex items-center justify-center">
+                <div className="h-5 w-5 rounded-full bg-primary/50" />
+              </div>
               <div className="space-y-2 flex-1">
-                <div className="h-2 bg-muted rounded w-1/2" />
-                <div className="h-2 bg-muted rounded w-1/3" />
+                <div className="h-2.5 bg-muted rounded w-1/2" />
+                <div className="h-2.5 bg-muted/70 rounded w-1/3" />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="absolute -bottom-4 -right-4 h-24 w-24 bg-primary/10 rounded-full blur-2xl" />
+      <div className="absolute -bottom-6 -right-6 h-32 w-32 bg-primary/20 rounded-full blur-3xl" />
+      <div className="absolute -top-4 -left-4 h-20 w-20 bg-primary/15 rounded-full blur-2xl" />
     </div>
   );
 
