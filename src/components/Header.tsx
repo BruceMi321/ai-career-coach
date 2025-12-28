@@ -252,49 +252,44 @@ const Header = () => {
             </div>
           )}
 
-          {/* Mobile Menu Button */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="lg:hidden h-8 w-8 px-0 ml-1"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </Button>
+          {/* Mobile Menu - DropdownMenu */}
+          <div className="lg:hidden">
+            <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 px-0 ml-1"
+                >
+                  {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[120px]">
+                {navItems.map((item) => (
+                  <DropdownMenuItem key={item.label} asChild>
+                    <Link 
+                      to={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem asChild>
+                  <Link to="#" onClick={() => setMobileMenuOpen(false)}>
+                    {t("关于我们", "About")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="#" onClick={() => setMobileMenuOpen(false)}>
+                    {t("帮助中心", "Help")}
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background">
-          <nav className="container px-4 py-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Link
-              to="#"
-              className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("关于我们", "About")}
-            </Link>
-            <Link
-              to="#"
-              className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("帮助中心", "Help")}
-            </Link>
-          </nav>
-        </div>
-      )}
     </header>
   );
 };
