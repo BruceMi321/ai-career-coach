@@ -150,3 +150,40 @@
     @apply font-serif tracking-tight;
   }
 }
+
+/* Page transition animations */
+@layer utilities {
+  .page-transition {
+    @apply w-full min-h-screen;
+  }
+
+  .page-enter {
+    animation: pageEnter 0.3s ease-out forwards;
+  }
+
+  .page-exit {
+    animation: pageExit 0.2s ease-in forwards;
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pageExit {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+}
