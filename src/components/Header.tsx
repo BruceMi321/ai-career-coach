@@ -70,8 +70,8 @@ const Header = () => {
   };
 
   const navItems = [
-    { label: t("使用指南", "Guide"), href: "#", icon: BookOpen },
-    { label: t("价格", "Pricing"), href: "#", icon: CreditCard },
+    { label: t("使用指南", "Guide"), href: "/guide", icon: BookOpen },
+    { label: t("价格", "Pricing"), href: "/pricing", icon: CreditCard },
   ];
 
   return (
@@ -107,13 +107,13 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
-                <Link to="#" className="flex items-center gap-2">
+                <Link to="/about" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   {t("关于我们", "About")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="#" className="flex items-center gap-2">
+                <Link to="/help" className="flex items-center gap-2">
                   <HelpCircle className="h-4 w-4" />
                   {t("帮助中心", "Help")}
                 </Link>
@@ -321,13 +321,13 @@ const Header = () => {
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="#" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                  <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     {t("关于我们", "About")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="#" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                  <Link to="/help" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
                     <HelpCircle className="h-4 w-4" />
                     {t("帮助中心", "Help")}
                   </Link>

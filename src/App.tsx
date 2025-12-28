@@ -10,6 +10,10 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ContactExpert from "./pages/ContactExpert";
+import Guide from "./pages/Guide";
+import Pricing from "./pages/Pricing";
+import About from "./pages/About";
+import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +30,10 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/contact-expert" element={<ContactExpert />} />
+        <Route path="/guide" element={<Guide />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/help" element={<Help />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
