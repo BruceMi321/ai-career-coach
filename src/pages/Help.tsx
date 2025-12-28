@@ -1,7 +1,9 @@
-import { ArrowLeft, Mail, HelpCircle, Shield, Zap, FileText, MessageSquare, CreditCard } from "lucide-react";
+import { useState, useMemo } from "react";
+import { ArrowLeft, Mail, HelpCircle, Shield, Zap, FileText, MessageSquare, CreditCard, Search, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Accordion,
   AccordionContent,
@@ -11,7 +13,8 @@ import {
 import { useLanguage } from "@/hooks/useLanguage";
 
 const Help = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const faqs = [
     {
@@ -110,6 +113,21 @@ const Help = () => {
     },
   ];
 
+  // Filter FAQs based on search query
+  const filteredFaqs = useMemo(() => {
+    if (!searchQuery.trim()) return faqs;
+    
+    const query = searchQuery.toLowerCase();
+    return faqs.map(category => ({
+      ...category,
+      questions: category.questions.filter(
+        item => item.q.toLowerCase().includes(query) || item.a.toLowerCase().includes(query)
+      ),
+    })).filter(category => category.questions.length > 0);
+  }, [searchQuery, language]);
+
+  const totalResults = filteredFaqs.reduce((acc, cat) => acc + cat.questions.length, 0);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -126,7 +144,7 @@ const Help = () => {
 
       {/* Content */}
       <div className="container px-4 py-12 max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 mb-4">
             <HelpCircle className="h-8 w-8 text-primary" />
           </div>
@@ -141,9 +159,42 @@ const Help = () => {
           </p>
         </div>
 
+        {/* Search Box */}
+        <div className="relative max-w-xl mx-auto mb-8">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder={t("搜索常见问题...", "Search FAQs...")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-10 h-12 text-base"
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              onClick={() => setSearchQuery("")}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Search Results Info */}
+        {searchQuery && (
+          <div className="text-center mb-6">
+            <p className="text-sm text-muted-foreground">
+              {totalResults > 0 
+                ? t(`找到 ${totalResults} 个相关结果`, `Found ${totalResults} result${totalResults > 1 ? 's' : ''}`)
+                : t("未找到相关结果，请尝试其他关键词", "No results found. Try different keywords.")}
+            </p>
+          </div>
+        )}
+
         {/* FAQ Categories */}
         <div className="space-y-8 mb-12">
-          {faqs.map((category, categoryIndex) => (
+          {filteredFaqs.map((category, categoryIndex) => (
             <Card key={categoryIndex}>
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -154,7 +205,7 @@ const Help = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion type="single" collapsible className="w-full" defaultValue={searchQuery ? `${categoryIndex}-0` : undefined}>
                   {category.questions.map((item, index) => (
                     <AccordionItem key={index} value={`${categoryIndex}-${index}`}>
                       <AccordionTrigger className="text-left">
@@ -170,6 +221,20 @@ const Help = () => {
             </Card>
           ))}
         </div>
+
+        {/* No Results Message */}
+        {searchQuery && totalResults === 0 && (
+          <Card className="text-center p-8 mb-12">
+            <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-semibold mb-2">{t("没有找到匹配的问题", "No matching questions found")}</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              {t("请尝试使用不同的关键词，或直接联系我们获取帮助", "Try different keywords or contact us directly for help")}
+            </p>
+            <Button variant="outline" onClick={() => setSearchQuery("")}>
+              {t("清除搜索", "Clear Search")}
+            </Button>
+          </Card>
+        )}
 
         {/* Contact Section */}
         <Card className="bg-muted/50">
