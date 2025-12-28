@@ -29,18 +29,8 @@ const WelcomeDialog = ({ externalOpen, onExternalOpenChange }: WelcomeDialogProp
   const open = isControlled ? externalOpen : internalOpen;
   const setOpen = isControlled ? onExternalOpenChange! : setInternalOpen;
 
-  useEffect(() => {
-    // Only auto-show on first visit if not controlled externally
-    if (!isControlled) {
-      const hasSeenWelcome = localStorage.getItem(WELCOME_STORAGE_KEY);
-      const neverShowAgain = localStorage.getItem(WELCOME_NEVER_SHOW_KEY);
-      
-      if (!hasSeenWelcome && !neverShowAgain) {
-        const timer = setTimeout(() => setInternalOpen(true), 500);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [isControlled]);
+  // WelcomeDialog no longer auto-shows - OnboardingTour handles first-time visitors
+  // This dialog is only shown when triggered from the menu
 
   const handleClose = () => {
     setOpen(false);
