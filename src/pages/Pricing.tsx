@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const Pricing = () => {
@@ -61,27 +62,53 @@ const Pricing = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast({
-      title: t("预约成功！", "Reservation Successful!"),
-      description: t(
-        "感谢您的兴趣，我们会在 1-2 个工作日内与您联系。",
-        "Thank you for your interest. We will contact you within 1-2 business days."
-      ),
-    });
-    
-    setFormData({
-      companyName: "",
-      contactName: "",
-      email: "",
-      phone: "",
-      teamSize: "",
-      message: "",
-    });
-    setIsSubmitting(false);
-    setIsDialogOpen(false);
+    try {
+      const { error } = await supabase
+        .from('enterprise_reservations')
+        .insert({
+          company_name: formData.companyName,
+          contact_name: formData.contactName,
+          email: formData.email,
+          phone: formData.phone || null,
+          team_size: formData.teamSize || null,
+          message: formData.message || null,
+        });
+
+      if (error) {
+        console.error("Error saving reservation:", error);
+        throw error;
+      }
+
+      toast({
+        title: t("预约成功！", "Reservation Successful!"),
+        description: t(
+          "感谢您的兴趣，我们会在 1-2 个工作日内与您联系。",
+          "Thank you for your interest. We will contact you within 1-2 business days."
+        ),
+      });
+      
+      setFormData({
+        companyName: "",
+        contactName: "",
+        email: "",
+        phone: "",
+        teamSize: "",
+        message: "",
+      });
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: t("提交失败", "Submission Failed"),
+        description: t(
+          "请稍后重试或直接联系我们。",
+          "Please try again later or contact us directly."
+        ),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const freeFeatures = [
