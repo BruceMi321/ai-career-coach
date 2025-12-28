@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApiConfig } from "@/hooks/useApiConfig";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Loader2, Send, MessageSquare, User, Bot, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -18,13 +19,6 @@ interface MockInterviewProps {
   jobDescription: string;
 }
 
-const INTERVIEW_TYPES = [
-  { value: "behavioral", label: "行为面试", description: "基于STAR法则的行为问题" },
-  { value: "technical", label: "技术面试", description: "技术能力和专业知识" },
-  { value: "situational", label: "情景面试", description: "假设场景的应对能力" },
-  { value: "comprehensive", label: "综合面试", description: "全面评估各方面能力" },
-];
-
 const MockInterview = ({ jobDescription }: MockInterviewProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -35,6 +29,14 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { activeConfig, hasApiConfig } = useApiConfig();
+  const { t } = useLanguage();
+
+  const INTERVIEW_TYPES = [
+    { value: "behavioral", label: t("行为面试", "Behavioral"), description: t("基于STAR法则的行为问题", "STAR-based behavioral questions") },
+    { value: "technical", label: t("技术面试", "Technical"), description: t("技术能力和专业知识", "Technical skills and expertise") },
+    { value: "situational", label: t("情景面试", "Situational"), description: t("假设场景的应对能力", "Handling hypothetical scenarios") },
+    { value: "comprehensive", label: t("综合面试", "Comprehensive"), description: t("全面评估各方面能力", "Overall capability assessment") },
+  ];
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -45,8 +47,8 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
   const startInterview = async () => {
     if (!jobDescription.trim()) {
       toast({
-        title: "请先填写职位描述",
-        description: "需要职位描述才能开始模拟面试",
+        title: t("请先填写职位描述", "Please fill in job description"),
+        description: t("需要职位描述才能开始模拟面试", "Job description is required to start mock interview"),
         variant: "destructive",
       });
       return;
@@ -54,8 +56,8 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
 
     if (!hasApiConfig || !activeConfig) {
       toast({
-        title: "请先配置AI API",
-        description: "需要配置API才能使用面试功能",
+        title: t("请先配置AI API", "Please configure AI API first"),
+        description: t("需要配置API才能使用面试功能", "API configuration is required for interview"),
         variant: "destructive",
       });
       return;
@@ -90,8 +92,8 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
     } catch (error) {
       console.error("Interview error:", error);
       toast({
-        title: "面试启动失败",
-        description: "请稍后重试",
+        title: t("面试启动失败", "Failed to start interview"),
+        description: t("请稍后重试", "Please try again later"),
         variant: "destructive",
       });
       setIsStarted(false);
@@ -173,8 +175,8 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
     } catch (error) {
       console.error("Message error:", error);
       toast({
-        title: "发送失败",
-        description: "请稍后重试",
+        title: t("发送失败", "Failed to send"),
+        description: t("请稍后重试", "Please try again later"),
         variant: "destructive",
       });
     } finally {
@@ -193,15 +195,15 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-primary" />
-            AI 模拟面试
+            {t("AI 模拟面试", "AI Mock Interview")}
           </CardTitle>
           <CardDescription>
-            选择面试类型，开始模拟面试练习
+            {t("选择面试类型，开始模拟面试练习", "Select interview type and start practicing")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium">面试类型</label>
+            <label className="text-sm font-medium">{t("面试类型", "Interview Type")}</label>
             <Select value={interviewType} onValueChange={setInterviewType}>
               <SelectTrigger>
                 <SelectValue />
@@ -221,7 +223,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
 
           {!jobDescription.trim() && (
             <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/50 p-3 rounded-lg">
-              请先在上方填写职位描述，然后开始模拟面试
+              {t("请先在上方填写职位描述，然后开始模拟面试", "Please fill in job description above first, then start mock interview")}
             </p>
           )}
 
@@ -235,7 +237,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
             ) : (
               <Play className="h-4 w-4" />
             )}
-            开始模拟面试
+            {t("开始模拟面试", "Start Mock Interview")}
           </Button>
         </CardContent>
       </Card>
@@ -248,14 +250,14 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
         <div>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-primary" />
-            模拟面试进行中
+            {t("模拟面试进行中", "Interview in Progress")}
           </CardTitle>
           <CardDescription>
-            {INTERVIEW_TYPES.find(t => t.value === interviewType)?.label}
+            {INTERVIEW_TYPES.find(type => type.value === interviewType)?.label}
           </CardDescription>
         </div>
         <Button variant="outline" size="sm" onClick={resetInterview}>
-          结束面试
+          {t("结束面试", "End Interview")}
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -302,7 +304,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
 
         <div className="flex gap-2">
           <Textarea
-            placeholder="输入您的回答..."
+            placeholder={t("输入您的回答...", "Type your answer...")}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => {
