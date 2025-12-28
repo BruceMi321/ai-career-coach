@@ -1,4 +1,5 @@
-import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe } from "lucide-react";
+import { useState } from "react";
+import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -16,127 +17,213 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { label: t("简历分析", "Resume Analysis"), href: "/" },
-    { label: t("模拟面试", "Mock Interview"), href: "/" },
+    { label: t("简历分析", "Resume"), href: "/" },
+    { label: t("模拟面试", "Interview"), href: "/" },
     { label: t("使用指南", "Guide"), href: "#" },
     { label: t("价格", "Pricing"), href: "#" },
   ];
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container flex h-16 items-center justify-between px-4">
+    <header className="border-b border-border bg-background sticky top-0 z-50">
+      <div className="container flex h-14 items-center justify-between px-4">
         {/* Brand */}
-        <div className="flex items-center gap-10">
-          <Link to="/" className="flex items-center">
-            <span className="text-xl tracking-tight">
-              <span className="font-light">your</span>
-              <span className="font-semibold">way</span>
-              <span className="font-light text-primary">career</span>
-            </span>
-          </Link>
+        <Link to="/" className="flex items-center shrink-0">
+          <span className="text-lg tracking-tight">
+            <span className="font-light">your</span>
+            <span className="font-semibold">way</span>
+            <span className="text-primary">career</span>
+          </span>
+        </Link>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-foreground">
-                  {t("更多", "More")}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                  <Link to="#" className="cursor-pointer">{t("关于我们", "About Us")}</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="#" className="cursor-pointer">{t("帮助中心", "Help Center")}</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </nav>
-        </div>
-
-        {/* Right side actions */}
-        <div className="flex items-center gap-2">
-          {/* Language Toggle */}
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-6 mx-8">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.href}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <Globe className="h-4 w-4" />
-              </Button>
+              <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                {t("更多", "More")}
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem 
-                onClick={() => setLanguage("zh")}
-                className={language === "zh" ? "bg-muted" : ""}
-              >
-                中文
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem asChild>
+                <Link to="#">{t("关于我们", "About")}</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLanguage("en")}
-                className={language === "en" ? "bg-muted" : ""}
-              >
-                English
+              <DropdownMenuItem asChild>
+                <Link to="#">{t("帮助中心", "Help")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </nav>
+
+        {/* Right side actions */}
+        <div className="flex items-center gap-1">
+          {/* Language Toggle - Desktop */}
+          <div className="hidden sm:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 px-2 gap-1.5 text-muted-foreground">
+                  <Globe className="h-3.5 w-3.5" />
+                  <span className="text-xs">{language === "zh" ? "中" : "EN"}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem 
+                  onClick={() => setLanguage("zh")}
+                  className={language === "zh" ? "bg-muted" : ""}
+                >
+                  中文
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setLanguage("en")}
+                  className={language === "en" ? "bg-muted" : ""}
+                >
+                  English
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           {/* Theme Toggle */}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+          <Button variant="ghost" size="sm" onClick={toggleTheme} className="h-8 w-8 px-0">
             {theme === "light" ? (
-              <Moon className="h-4 w-4" />
+              <Moon className="h-3.5 w-3.5" />
             ) : (
-              <Sun className="h-4 w-4" />
+              <Sun className="h-3.5 w-3.5" />
             )}
           </Button>
 
-          <div className="w-px h-6 bg-border mx-1" />
+          <div className="hidden sm:block w-px h-5 bg-border mx-2" />
 
-          <ApiSettingsDialog />
+          {/* API Settings - Hidden on mobile */}
+          <div className="hidden sm:block">
+            <ApiSettingsDialog />
+          </div>
           
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline max-w-32 truncate">{user.email}</span>
+                <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2">
+                  <User className="h-3.5 w-3.5" />
+                  <span className="hidden md:inline max-w-24 truncate text-xs">{user.email}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={signOut} className="gap-2 cursor-pointer">
-                  <LogOut className="h-4 w-4" />
+                <DropdownMenuItem onClick={signOut} className="gap-2">
+                  <LogOut className="h-3.5 w-3.5" />
                   {t("退出登录", "Sign Out")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <>
+            <div className="hidden sm:flex items-center gap-2">
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="font-normal">
+                <Button variant="ghost" size="sm" className="h-8 text-xs">
                   {t("登录", "Sign In")}
                 </Button>
               </Link>
               <Link to="/contact-expert">
-                <Button variant="outline" size="sm" className="gap-2">
-                  {t("寻找人工专家", "Find Expert")}
-                  <ArrowRight className="h-4 w-4" />
+                <Button size="sm" className="h-8 text-xs gap-1.5">
+                  {t("专家咨询", "Expert")}
+                  <ArrowRight className="h-3 w-3" />
                 </Button>
               </Link>
-            </>
+            </div>
           )}
+
+          {/* Mobile Menu Button */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="lg:hidden h-8 w-8 px-0 ml-1"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-border bg-background">
+          <nav className="container px-4 py-4 space-y-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <Link
+              to="#"
+              className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {t("关于我们", "About")}
+            </Link>
+            <Link
+              to="#"
+              className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {t("帮助中心", "Help")}
+            </Link>
+            
+            <div className="pt-4 border-t border-border mt-4 space-y-2">
+              {!user && (
+                <>
+                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full" size="sm">
+                      {t("登录", "Sign In")}
+                    </Button>
+                  </Link>
+                  <Link to="/contact-expert" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full" size="sm">
+                      {t("专家咨询", "Expert Consultation")}
+                    </Button>
+                  </Link>
+                </>
+              )}
+              
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs text-muted-foreground">{t("语言", "Language")}</span>
+                <div className="flex gap-2">
+                  <Button 
+                    variant={language === "zh" ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="h-7 text-xs"
+                    onClick={() => setLanguage("zh")}
+                  >
+                    中文
+                  </Button>
+                  <Button 
+                    variant={language === "en" ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="h-7 text-xs"
+                    onClick={() => setLanguage("en")}
+                  >
+                    EN
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
