@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ApiSettingsDialog from "./ApiSettingsDialog";
 
 const Header = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +23,7 @@ const Header = () => {
           <span className="text-xl font-semibold">职业发展教练</span>
         </Link>
         <nav className="flex items-center gap-4">
+          <ApiSettingsDialog />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
