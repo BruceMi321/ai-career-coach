@@ -34,11 +34,11 @@ const Footer = () => {
         <div className="lg:hidden space-y-10">
           {/* Brand - Mobile */}
           <div className="text-center pb-8 border-b border-border">
-            <Link to="/" className="inline-block mb-4">
-              <span className="text-xl tracking-tight">
-                <span className="font-light">your</span>
-                <span className="font-semibold">way</span>
-                <span className="text-primary">career</span>
+            <Link to="/" className="inline-block mb-4 group">
+              <span className="text-2xl tracking-wide font-heading">
+                <span className="font-light text-muted-foreground group-hover:text-foreground transition-colors">your</span>
+                <span className="font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">way</span>
+                <span className="font-medium text-foreground">career</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
@@ -78,11 +78,11 @@ const Footer = () => {
         <div className="hidden lg:grid grid-cols-5 gap-12">
           {/* Brand */}
           <div>
-            <Link to="/" className="inline-block mb-6">
-              <span className="text-xl tracking-tight">
-                <span className="font-light">your</span>
-                <span className="font-semibold">way</span>
-                <span className="text-primary">career</span>
+            <Link to="/" className="inline-block mb-6 group">
+              <span className="text-2xl tracking-wide font-heading">
+                <span className="font-light text-muted-foreground group-hover:text-foreground transition-colors">your</span>
+                <span className="font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">way</span>
+                <span className="font-medium text-foreground">career</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">

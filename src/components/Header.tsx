@@ -30,11 +30,11 @@ const Header = () => {
     <header className="border-b border-border bg-background sticky top-0 z-50">
       <div className="container flex h-14 items-center justify-between px-4">
         {/* Brand */}
-        <Link to="/" className="flex items-center shrink-0">
-          <span className="text-lg tracking-tight">
-            <span className="font-light">your</span>
-            <span className="font-semibold">way</span>
-            <span className="text-primary">career</span>
+        <Link to="/" className="flex items-center shrink-0 group">
+          <span className="text-xl md:text-2xl tracking-wide font-heading">
+            <span className="font-light text-muted-foreground group-hover:text-foreground transition-colors">your</span>
+            <span className="font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">way</span>
+            <span className="font-medium text-foreground">career</span>
           </span>
         </Link>
 
