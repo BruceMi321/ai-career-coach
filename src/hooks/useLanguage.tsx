@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 type Language = "zh" | "en";
 
@@ -6,6 +6,7 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (zh: string, en: string) => string;
+  isTransitioning: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -16,18 +17,40 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     if (stored === "zh" || stored === "en") return stored;
     return "zh";
   });
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem("language", lang);
+    if (lang === language) return;
+    
+    setIsTransitioning(true);
+    
+    // Small delay for fade out effect
+    setTimeout(() => {
+      setLanguage(lang);
+      localStorage.setItem("language", lang);
+      
+      // Fade back in
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 150);
+    }, 150);
   };
 
   const t = (zh: string, en: string) => {
     return language === "zh" ? zh : en;
   };
 
+  // Add transition class to body during language switch
+  useEffect(() => {
+    if (isTransitioning) {
+      document.body.classList.add("language-transitioning");
+    } else {
+      document.body.classList.remove("language-transitioning");
+    }
+  }, [isTransitioning]);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t, isTransitioning }}>
       {children}
     </LanguageContext.Provider>
   );

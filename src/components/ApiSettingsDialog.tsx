@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useApiConfig, API_PROVIDERS, ApiConfig } from "@/hooks/useApiConfig";
+import { useApiConfig, useApiProviders, ApiConfig } from "@/hooks/useApiConfig";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Settings, Plus, Trash2, Check, Eye, EyeOff, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,7 @@ interface ApiSettingsDialogProps {
 
 const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   const { configs, activeConfig, addConfig, removeConfig, setActiveProvider } = useApiConfig();
+  const apiProviders = useApiProviders();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -42,7 +43,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   const [baseUrl, setBaseUrl] = useState("");
   const [model, setModel] = useState("");
 
-  const selectedProviderInfo = API_PROVIDERS.find((p) => p.id === provider);
+  const selectedProviderInfo = apiProviders.find((p) => p.id === provider);
 
   const resetForm = () => {
     setProvider("openai");
@@ -101,7 +102,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
   };
 
   const existingProviders = configs.map((c) => c.provider);
-  const availableProviders = API_PROVIDERS.filter(
+  const availableProviders = apiProviders.filter(
     (p) => !existingProviders.includes(p.id)
   );
 
@@ -132,7 +133,7 @@ const ApiSettingsDialog = ({ trigger }: ApiSettingsDialogProps) => {
             <div className="space-y-3">
               <Label className="text-base">{t("已配置的服务", "Configured Services")}</Label>
               {configs.map((config) => {
-                const providerInfo = API_PROVIDERS.find((p) => p.id === config.provider);
+                const providerInfo = apiProviders.find((p) => p.id === config.provider);
                 const isActive = activeConfig?.provider === config.provider;
                 return (
                   <Card
