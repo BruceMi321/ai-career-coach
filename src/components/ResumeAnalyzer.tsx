@@ -118,12 +118,12 @@ const ResumeAnalyzer = () => {
       {!hasApiConfig && <ApiRequiredAlert />}
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto h-12 bg-muted/50 p-1">
-          <TabsTrigger value="analyze" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto h-12 bg-muted/50 p-1" data-tour-step="tabs">
+          <TabsTrigger value="analyze" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm" data-tour-step="analyze-tab">
             <Sparkles className="h-4 w-4" />
             {t("简历分析", "Resume Analysis")}
           </TabsTrigger>
-          <TabsTrigger value="interview" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="interview" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm" data-tour-step="interview-tab">
             <MessageSquare className="h-4 w-4" />
             {t("模拟面试", "Mock Interview")}
           </TabsTrigger>

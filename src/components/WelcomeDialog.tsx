@@ -144,6 +144,19 @@ const WelcomeDialog = ({ externalOpen, onExternalOpenChange }: WelcomeDialogProp
             {t("开始使用", "Get Started")}
             <ArrowRight className="h-4 w-4" />
           </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              handleClose();
+              // Trigger the onboarding tour after closing
+              setTimeout(() => {
+                window.dispatchEvent(new CustomEvent("startOnboardingTour"));
+              }, 300);
+            }} 
+            className="w-full"
+          >
+            {t("查看功能导览", "Take Feature Tour")}
+          </Button>
           <Button variant="ghost" onClick={handleClose} className="w-full text-muted-foreground">
             {t("稍后探索", "Explore Later")}
           </Button>
