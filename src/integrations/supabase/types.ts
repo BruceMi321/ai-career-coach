@@ -44,6 +44,45 @@ export type Database = {
         }
         Relationships: []
       }
+      enterprise_reservations: {
+        Row: {
+          company_name: string
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          phone: string | null
+          status: string
+          team_size: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          status?: string
+          team_size?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          status?: string
+          team_size?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       interview_sessions: {
         Row: {
           created_at: string
