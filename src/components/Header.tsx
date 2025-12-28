@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare } from "lucide-react";
+import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -57,8 +57,8 @@ const Header = () => {
   };
 
   const navItems = [
-    { label: t("使用指南", "Guide"), href: "#" },
-    { label: t("价格", "Pricing"), href: "#" },
+    { label: t("使用指南", "Guide"), href: "#", icon: BookOpen },
+    { label: t("价格", "Pricing"), href: "#", icon: CreditCard },
   ];
 
   return (
@@ -265,25 +265,29 @@ const Header = () => {
                   {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[120px] animate-fade-in">
+              <DropdownMenuContent align="end" className="min-w-[140px] animate-fade-in">
                 {navItems.map((item) => (
                   <DropdownMenuItem key={item.label} asChild>
                     <Link 
                       to={item.href}
                       onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2"
                     >
+                      <item.icon className="h-4 w-4" />
                       {item.label}
                     </Link>
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="#" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="#" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
                     {t("关于我们", "About")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="#" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="#" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4" />
                     {t("帮助中心", "Help")}
                   </Link>
                 </DropdownMenuItem>
