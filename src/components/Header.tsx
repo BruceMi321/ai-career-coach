@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle } from "lucide-react";
+import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare, BookOpen, CreditCard, Users, HelpCircle, RotateCcw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ApiSettingsDialog from "./ApiSettingsDialog";
+import WelcomeDialog, { resetWelcomeDialog } from "./WelcomeDialog";
 
 const GUIDE_STORAGE_KEY = "header-guide-seen";
 
@@ -33,6 +34,7 @@ const Header = () => {
   const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
 
   useEffect(() => {
     const hasSeenGuide = localStorage.getItem(GUIDE_STORAGE_KEY);
@@ -104,6 +106,17 @@ const Header = () => {
                   <HelpCircle className="h-4 w-4" />
                   {t("帮助中心", "Help")}
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => {
+                  resetWelcomeDialog();
+                  setShowWelcomeDialog(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t("查看引导", "View Guide")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -298,11 +311,29 @@ const Header = () => {
                     {t("帮助中心", "Help")}
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    resetWelcomeDialog();
+                    setShowWelcomeDialog(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  {t("查看引导", "View Guide")}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </div>
+
+      {/* Welcome Dialog - triggered from menu */}
+      <WelcomeDialog 
+        externalOpen={showWelcomeDialog} 
+        onExternalOpenChange={setShowWelcomeDialog} 
+      />
     </header>
   );
 };

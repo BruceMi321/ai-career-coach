@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, MessageSquare, FileText, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -11,23 +12,43 @@ import {
 } from "@/components/ui/dialog";
 
 const WELCOME_STORAGE_KEY = "welcome-dialog-seen";
+const WELCOME_NEVER_SHOW_KEY = "welcome-dialog-never-show";
 
-const WelcomeDialog = () => {
-  const [open, setOpen] = useState(false);
+interface WelcomeDialogProps {
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
+}
+
+const WelcomeDialog = ({ externalOpen, onExternalOpenChange }: WelcomeDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [neverShow, setNeverShow] = useState(false);
   const { t } = useLanguage();
 
+  // Determine if dialog is controlled externally
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled ? onExternalOpenChange! : setInternalOpen;
+
   useEffect(() => {
-    const hasSeenWelcome = localStorage.getItem(WELCOME_STORAGE_KEY);
-    if (!hasSeenWelcome) {
-      // Delay slightly to let the page load first
-      const timer = setTimeout(() => setOpen(true), 500);
-      return () => clearTimeout(timer);
+    // Only auto-show on first visit if not controlled externally
+    if (!isControlled) {
+      const hasSeenWelcome = localStorage.getItem(WELCOME_STORAGE_KEY);
+      const neverShowAgain = localStorage.getItem(WELCOME_NEVER_SHOW_KEY);
+      
+      if (!hasSeenWelcome && !neverShowAgain) {
+        const timer = setTimeout(() => setInternalOpen(true), 500);
+        return () => clearTimeout(timer);
+      }
     }
-  }, []);
+  }, [isControlled]);
 
   const handleClose = () => {
     setOpen(false);
     localStorage.setItem(WELCOME_STORAGE_KEY, "true");
+    
+    if (neverShow) {
+      localStorage.setItem(WELCOME_NEVER_SHOW_KEY, "true");
+    }
   };
 
   const handleGetStarted = () => {
@@ -101,6 +122,23 @@ const WelcomeDialog = () => {
           ))}
         </div>
 
+        {/* Don't show again checkbox - only show if not triggered from menu */}
+        {!isControlled && (
+          <div className="flex items-center space-x-2 py-2">
+            <Checkbox
+              id="never-show"
+              checked={neverShow}
+              onCheckedChange={(checked) => setNeverShow(checked as boolean)}
+            />
+            <label
+              htmlFor="never-show"
+              className="text-xs text-muted-foreground cursor-pointer"
+            >
+              {t("不再显示此引导", "Don't show this guide again")}
+            </label>
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           <Button onClick={handleGetStarted} className="w-full gap-2">
             {t("开始使用", "Get Started")}
@@ -113,6 +151,12 @@ const WelcomeDialog = () => {
       </DialogContent>
     </Dialog>
   );
+};
+
+// Export function to reset welcome dialog (for settings)
+export const resetWelcomeDialog = () => {
+  localStorage.removeItem(WELCOME_STORAGE_KEY);
+  localStorage.removeItem(WELCOME_NEVER_SHOW_KEY);
 };
 
 export default WelcomeDialog;
