@@ -1,4 +1,4 @@
-import { CheckCircle, Zap, Shield, BarChart3 } from "lucide-react";
+import { CheckCircle, Zap, Shield, BarChart3, FileText, Target, TrendingUp, Star, Award } from "lucide-react";
 
 interface FeatureBlockProps {
   title: string;
@@ -7,9 +7,138 @@ interface FeatureBlockProps {
   features: string[];
   imagePosition: "left" | "right";
   icon: React.ReactNode;
+  visualType: "matching" | "evaluation" | "optimization";
 }
 
-const FeatureBlock = ({ title, highlight, description, features, imagePosition, icon }: FeatureBlockProps) => {
+const MatchingVisual = () => (
+  <div className="relative">
+    <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-6 flex flex-col justify-center">
+      {/* Resume vs JD comparison */}
+      <div className="flex gap-4 items-start">
+        <div className="flex-1 bg-background rounded-xl border border-border p-4 shadow-lg">
+          <div className="flex items-center gap-2 mb-3">
+            <FileText className="h-4 w-4 text-primary" />
+            <span className="text-xs font-medium">您的简历</span>
+          </div>
+          <div className="space-y-2">
+            <div className="h-2 bg-primary/40 rounded w-full" />
+            <div className="h-2 bg-primary/30 rounded w-4/5" />
+            <div className="h-2 bg-muted rounded w-3/5" />
+          </div>
+        </div>
+        <div className="flex-1 bg-background rounded-xl border border-border p-4 shadow-lg">
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="h-4 w-4 text-primary" />
+            <span className="text-xs font-medium">职位要求</span>
+          </div>
+          <div className="space-y-2">
+            <div className="h-2 bg-primary/40 rounded w-full" />
+            <div className="h-2 bg-primary/30 rounded w-3/4" />
+            <div className="h-2 bg-muted rounded w-4/5" />
+          </div>
+        </div>
+      </div>
+      {/* Match indicator */}
+      <div className="mt-4 bg-background rounded-lg border border-primary/30 p-3 flex items-center justify-between">
+        <span className="text-sm font-medium">匹配度</span>
+        <div className="flex items-center gap-2">
+          <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+            <div className="w-4/5 h-full bg-primary rounded-full" />
+          </div>
+          <span className="text-sm font-bold text-primary">85%</span>
+        </div>
+      </div>
+    </div>
+    <div className="absolute -bottom-4 -right-4 h-24 w-24 bg-primary/20 rounded-full blur-3xl" />
+  </div>
+);
+
+const EvaluationVisual = () => (
+  <div className="relative">
+    <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-6 flex items-center justify-center">
+      <div className="bg-background rounded-xl border border-border p-5 shadow-lg w-full">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">多维度评估</span>
+        </div>
+        <div className="space-y-3">
+          {[
+            { label: "技能匹配", value: 90, color: "bg-primary" },
+            { label: "经验相关", value: 75, color: "bg-primary/80" },
+            { label: "表达清晰", value: 85, color: "bg-primary/70" },
+            { label: "关键词覆盖", value: 70, color: "bg-primary/60" },
+          ].map((item, index) => (
+            <div key={index} className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground w-16 shrink-0">{item.label}</span>
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${item.color} rounded-full`} 
+                  style={{ width: `${item.value}%` }} 
+                />
+              </div>
+              <span className="text-xs font-medium w-8">{item.value}%</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">综合评分</span>
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4].map((i) => (
+              <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+            ))}
+            <Star className="h-4 w-4 text-muted" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="absolute -top-4 -left-4 h-20 w-20 bg-primary/15 rounded-full blur-2xl" />
+  </div>
+);
+
+const OptimizationVisual = () => (
+  <div className="relative">
+    <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-6 flex items-center justify-center">
+      <div className="bg-background rounded-xl border border-border p-5 shadow-lg w-full">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">优化建议</span>
+        </div>
+        <div className="space-y-3">
+          {[
+            { status: "done", text: "添加量化成果数据" },
+            { status: "done", text: "突出核心技能关键词" },
+            { status: "pending", text: "优化项目描述结构" },
+          ].map((item, index) => (
+            <div key={index} className="flex items-start gap-3 p-2 rounded-lg bg-muted/30">
+              <div className={`h-5 w-5 rounded-full flex items-center justify-center shrink-0 ${
+                item.status === "done" ? "bg-primary/20" : "bg-muted"
+              }`}>
+                {item.status === "done" ? (
+                  <CheckCircle className="h-3 w-3 text-primary" />
+                ) : (
+                  <div className="h-2 w-2 rounded-full bg-muted-foreground/50" />
+                )}
+              </div>
+              <span className="text-xs">{item.text}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 pt-3 border-t border-border">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">优化进度</span>
+            <span className="font-medium text-primary">2/3 完成</span>
+          </div>
+          <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+            <div className="w-2/3 h-full bg-primary rounded-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="absolute -bottom-6 -right-6 h-28 w-28 bg-primary/20 rounded-full blur-3xl" />
+  </div>
+);
+
+const FeatureBlock = ({ title, highlight, description, features, imagePosition, icon, visualType }: FeatureBlockProps) => {
   const content = (
     <div className="space-y-6">
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
@@ -33,30 +162,9 @@ const FeatureBlock = ({ title, highlight, description, features, imagePosition, 
     </div>
   );
 
-  const visual = (
-    <div className="relative">
-      <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/20 p-6 lg:p-8 flex items-center justify-center">
-        <div className="bg-background rounded-xl shadow-xl border border-border p-6 w-full max-w-sm">
-          <div className="space-y-4">
-            <div className="h-3 bg-primary/20 rounded w-3/4" />
-            <div className="h-3 bg-muted rounded w-1/2" />
-            <div className="h-3 bg-primary/40 rounded w-5/6" />
-            <div className="flex gap-3 mt-4">
-              <div className="h-10 w-10 rounded-full bg-primary/30 flex items-center justify-center">
-                <div className="h-5 w-5 rounded-full bg-primary/50" />
-              </div>
-              <div className="space-y-2 flex-1">
-                <div className="h-2.5 bg-muted rounded w-1/2" />
-                <div className="h-2.5 bg-muted/70 rounded w-1/3" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="absolute -bottom-6 -right-6 h-32 w-32 bg-primary/20 rounded-full blur-3xl" />
-      <div className="absolute -top-4 -left-4 h-20 w-20 bg-primary/15 rounded-full blur-2xl" />
-    </div>
-  );
+  const visual = visualType === "matching" ? <MatchingVisual /> :
+                 visualType === "evaluation" ? <EvaluationVisual /> :
+                 <OptimizationVisual />;
 
   return (
     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -90,6 +198,7 @@ const FeatureSection = () => {
           ]}
           imagePosition="right"
           icon={<Zap className="h-4 w-4" />}
+          visualType="matching"
         />
 
         <FeatureBlock
@@ -103,6 +212,7 @@ const FeatureSection = () => {
           ]}
           imagePosition="left"
           icon={<BarChart3 className="h-4 w-4" />}
+          visualType="evaluation"
         />
 
         <FeatureBlock
@@ -116,6 +226,7 @@ const FeatureSection = () => {
           ]}
           imagePosition="right"
           icon={<Shield className="h-4 w-4" />}
+          visualType="optimization"
         />
       </div>
     </section>
