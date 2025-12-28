@@ -1,4 +1,5 @@
-import { CheckCircle, Zap, Shield, BarChart3, FileText, Target, TrendingUp, Star, Award } from "lucide-react";
+import { CheckCircle, Zap, Shield, BarChart3 } from "lucide-react";
+import { useCountAnimation } from "@/hooks/useCountAnimation";
 
 interface FeatureBlockProps {
   title: string;
@@ -22,47 +23,59 @@ const DotGrid = () => (
   </div>
 );
 
-const MatchingVisual = () => (
-  <div className="relative rounded-2xl border border-border bg-card overflow-hidden">
-    <DotGrid />
-    <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
-      <div className="text-6xl lg:text-7xl font-light text-primary">
-        85<span className="text-3xl lg:text-4xl">%</span>
+const MatchingVisual = () => {
+  const { count, ref } = useCountAnimation({ end: 85, duration: 1500 });
+  
+  return (
+    <div ref={ref} className="relative rounded-2xl border border-border bg-card overflow-hidden">
+      <DotGrid />
+      <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
+        <div className="text-6xl lg:text-7xl font-light text-primary">
+          {count}<span className="text-3xl lg:text-4xl">%</span>
+        </div>
+        <p className="mt-4 text-muted-foreground text-center max-w-xs">
+          AI 智能分析简历与职位的匹配程度，精准定位提升方向
+        </p>
       </div>
-      <p className="mt-4 text-muted-foreground text-center max-w-xs">
-        AI 智能分析简历与职位的匹配程度，精准定位提升方向
-      </p>
     </div>
-  </div>
-);
+  );
+};
 
-const EvaluationVisual = () => (
-  <div className="relative rounded-2xl border border-border bg-card overflow-hidden">
-    <DotGrid />
-    <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
-      <div className="text-6xl lg:text-7xl font-light text-primary">
-        4<span className="text-3xl lg:text-4xl">维度</span>
+const EvaluationVisual = () => {
+  const { count, ref } = useCountAnimation({ end: 4, duration: 1000 });
+  
+  return (
+    <div ref={ref} className="relative rounded-2xl border border-border bg-card overflow-hidden">
+      <DotGrid />
+      <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
+        <div className="text-6xl lg:text-7xl font-light text-primary">
+          {count}<span className="text-3xl lg:text-4xl">维度</span>
+        </div>
+        <p className="mt-4 text-muted-foreground text-center max-w-xs">
+          技能匹配、经验相关、表达清晰、关键词覆盖全面评估
+        </p>
       </div>
-      <p className="mt-4 text-muted-foreground text-center max-w-xs">
-        技能匹配、经验相关、表达清晰、关键词覆盖全面评估
-      </p>
     </div>
-  </div>
-);
+  );
+};
 
-const OptimizationVisual = () => (
-  <div className="relative rounded-2xl border border-border bg-card overflow-hidden">
-    <DotGrid />
-    <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
-      <div className="text-6xl lg:text-7xl font-light text-primary">
-        30<span className="text-3xl lg:text-4xl">秒</span>
+const OptimizationVisual = () => {
+  const { count, ref } = useCountAnimation({ end: 30, duration: 1200 });
+  
+  return (
+    <div ref={ref} className="relative rounded-2xl border border-border bg-card overflow-hidden">
+      <DotGrid />
+      <div className="relative p-8 lg:p-10 flex flex-col items-center justify-center min-h-[280px]">
+        <div className="text-6xl lg:text-7xl font-light text-primary">
+          {count}<span className="text-3xl lg:text-4xl">秒</span>
+        </div>
+        <p className="mt-4 text-muted-foreground text-center max-w-xs">
+          快速生成专业优化建议，立即获得可行的改进方案
+        </p>
       </div>
-      <p className="mt-4 text-muted-foreground text-center max-w-xs">
-        快速生成专业优化建议，立即获得可行的改进方案
-      </p>
     </div>
-  </div>
-);
+  );
+};
 
 const FeatureBlock = ({ title, highlight, description, features, imagePosition, icon, visualType }: FeatureBlockProps) => {
   const content = (
