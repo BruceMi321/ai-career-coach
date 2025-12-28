@@ -185,14 +185,23 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
     }
   }, [autoStart, isControlled]);
 
+  // Step A: updateTargetRect 只做测量，不滚动
   const updateTargetRect = useCallback(() => {
     const step = tourSteps[currentStep];
     if (step.target) {
       const element = document.querySelector(step.target);
       if (element) {
         const rect = element.getBoundingClientRect();
-        setTargetRect(rect);
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        // 只有当 rect 有显著变化时才更新 state，减少不必要的重渲染
+        setTargetRect((prev) => {
+          if (!prev) return rect;
+          const changed =
+            Math.abs(prev.top - rect.top) > 1 ||
+            Math.abs(prev.left - rect.left) > 1 ||
+            Math.abs(prev.width - rect.width) > 1 ||
+            Math.abs(prev.height - rect.height) > 1;
+          return changed ? rect : prev;
+        });
       } else {
         setTargetRect(null);
       }
@@ -201,16 +210,55 @@ export const OnboardingTour = ({ externalOpen, onExternalOpenChange, autoStart =
     }
   }, [currentStep]);
 
+  // Step B: 仅在步骤切换时执行一次滚动
   useEffect(() => {
-    if (open) {
-      updateTargetRect();
-      window.addEventListener("resize", updateTargetRect);
-      window.addEventListener("scroll", updateTargetRect, true);
-      return () => {
-        window.removeEventListener("resize", updateTargetRect);
-        window.removeEventListener("scroll", updateTargetRect, true);
-      };
+    if (!open) return;
+
+    const step = tourSteps[currentStep];
+    if (!step.target) return;
+
+    const element = document.querySelector(step.target);
+    if (!element) return;
+
+    // 检查是否是 Header 内的元素或固定/粘性元素
+    const isInHeader = element.closest('header') !== null;
+    const computedStyle = getComputedStyle(element);
+    const isFixedOrSticky = computedStyle.position === 'fixed' || computedStyle.position === 'sticky';
+
+    // Header 内的元素或固定/粘性元素不需要滚动，它们本来就在视口内
+    if (isInHeader || isFixedOrSticky) {
+      return;
     }
+
+    // 非 Header 元素：滚动到视图，使用 auto 避免动画叠加导致抖动
+    element.scrollIntoView({ behavior: "auto", block: "center" });
+  }, [open, currentStep]);
+
+  // Step C: 使用 rAF 优化 scroll/resize 事件处理
+  useEffect(() => {
+    if (!open) return;
+
+    let rafId: number | null = null;
+
+    const handleUpdate = () => {
+      if (rafId) return; // 如果已经有 pending 的 rAF，跳过
+      rafId = requestAnimationFrame(() => {
+        updateTargetRect();
+        rafId = null;
+      });
+    };
+
+    // 初始测量
+    updateTargetRect();
+
+    window.addEventListener("resize", handleUpdate);
+    window.addEventListener("scroll", handleUpdate, true);
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", handleUpdate);
+      window.removeEventListener("scroll", handleUpdate, true);
+    };
   }, [open, currentStep, updateTargetRect]);
 
   // Elevate target element z-index during tour
