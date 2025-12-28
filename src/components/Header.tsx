@@ -22,15 +22,15 @@ const Header = () => {
   const location = useLocation();
 
   return (
-    <header className="border-b border-border/50 bg-background sticky top-0 z-50">
+    <header className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Brand */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-10">
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold tracking-tight">
+            <span className="text-xl tracking-tight">
               <span className="font-light">your</span>
-              <span className="font-bold italic">way</span>
-              <span className="font-light">career</span>
+              <span className="font-semibold">way</span>
+              <span className="font-light text-primary">career</span>
             </span>
           </Link>
 
@@ -40,7 +40,7 @@ const Header = () => {
               <Link
                 key={item.label}
                 to={item.href}
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left"
               >
                 {item.label}
               </Link>
@@ -52,12 +52,12 @@ const Header = () => {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="start" className="min-w-[140px]">
                 <DropdownMenuItem asChild>
-                  <Link to="#">关于我们</Link>
+                  <Link to="#" className="cursor-pointer">关于我们</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="#">帮助中心</Link>
+                  <Link to="#" className="cursor-pointer">帮助中心</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -65,7 +65,7 @@ const Header = () => {
         </div>
 
         {/* Right side actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <ApiSettingsDialog />
           {user ? (
             <DropdownMenu>
@@ -76,7 +76,7 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={signOut} className="gap-2">
+                <DropdownMenuItem onClick={signOut} className="gap-2 cursor-pointer">
                   <LogOut className="h-4 w-4" />
                   退出登录
                 </DropdownMenuItem>
@@ -85,12 +85,12 @@ const Header = () => {
           ) : (
             <>
               <Link to="/auth">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="font-normal">
                   登录
                 </Button>
               </Link>
               <Link to="/contact-expert">
-                <Button size="sm" className="gap-1">
+                <Button variant="outline" size="sm" className="gap-2">
                   寻找人工专家
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -102,5 +102,4 @@ const Header = () => {
     </header>
   );
 };
-
 export default Header;
