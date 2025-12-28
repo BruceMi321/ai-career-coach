@@ -16,9 +16,9 @@ const Footer = () => {
       { label: t("合作伙伴", "Partners"), href: "/" },
     ],
     [t("资源", "Resources")]: [
-      { label: t("使用指南", "Guide"), href: "/" },
-      { label: t("常见问题", "FAQ"), href: "/" },
-      { label: t("博客", "Blog"), href: "/" },
+      { label: t("使用指南", "Guide"), href: "/guide" },
+      { label: t("常见问题", "FAQ"), href: "/help" },
+      { label: t("网站地图", "Sitemap"), href: "/sitemap" },
     ],
     [t("公司", "Company")]: [
       { label: t("关于我们", "About"), href: "/" },
