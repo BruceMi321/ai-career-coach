@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
@@ -32,32 +33,40 @@ const animationClasses = {
   },
 };
 
-export const ScrollReveal = ({
-  children,
-  className,
-  animation = "fade-up",
-  delay = 0,
-  duration = 600,
-}: ScrollRevealProps) => {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
-  const classes = animationClasses[animation];
+export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>(
+  ({ children, className, animation = "fade-up", delay = 0, duration = 600 }, forwardedRef) => {
+    const { ref: animationRef, isVisible } = useScrollAnimation({ threshold: 0.1 });
+    const classes = animationClasses[animation];
 
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "transition-all ease-out",
-        isVisible ? classes.visible : classes.hidden,
-        className
-      )}
-      style={{
-        transitionDuration: `${duration}ms`,
-        transitionDelay: `${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
+    // Combine refs
+    const setRefs = (node: HTMLDivElement | null) => {
+      (animationRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        forwardedRef.current = node;
+      }
+    };
+
+    return (
+      <div
+        ref={setRefs}
+        className={cn(
+          "transition-all ease-out",
+          isVisible ? classes.visible : classes.hidden,
+          className
+        )}
+        style={{
+          transitionDuration: `${duration}ms`,
+          transitionDelay: `${delay}ms`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+ScrollReveal.displayName = "ScrollReveal";
 
 export default ScrollReveal;
