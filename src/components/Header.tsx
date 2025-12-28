@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LogOut, User, ChevronDown, ArrowRight, Moon, Sun, Globe, Menu, X, Sparkles, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -11,13 +11,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import ApiSettingsDialog from "./ApiSettingsDialog";
+
+const GUIDE_STORAGE_KEY = "header-guide-seen";
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem(GUIDE_STORAGE_KEY);
+    if (!hasSeenGuide) {
+      const timer = setTimeout(() => setShowGuide(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const dismissGuide = () => {
+    setShowGuide(false);
+    localStorage.setItem(GUIDE_STORAGE_KEY, "true");
+  };
 
   const scrollToFeature = (tab: "analyze" | "interview") => {
     const element = document.getElementById("resume-analyzer");
@@ -46,24 +67,62 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-4 mx-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => scrollToFeature("analyze")}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            {t("简历分析", "Resume")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => scrollToFeature("interview")}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
-          >
-            <MessageSquare className="h-3.5 w-3.5" />
-            {t("模拟面试", "Interview")}
-          </Button>
+          <Popover open={showGuide} onOpenChange={setShowGuide}>
+            <PopoverTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    scrollToFeature("analyze");
+                    dismissGuide();
+                  }}
+                  className="gap-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {t("简历分析", "Resume")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    scrollToFeature("interview");
+                    dismissGuide();
+                  }}
+                  className="gap-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  {t("模拟面试", "Interview")}
+                </Button>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-64 p-3" 
+              side="bottom" 
+              align="start"
+              onPointerDownOutside={dismissGuide}
+            >
+              <div className="space-y-2">
+                <p className="text-sm font-medium">
+                  {t("✨ 快捷入口", "✨ Quick Access")}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "点击这里可以直接跳转到简历分析或模拟面试功能，无需滚动页面。",
+                    "Click here to jump directly to Resume Analysis or Mock Interview without scrolling."
+                  )}
+                </p>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full text-xs h-7"
+                  onClick={dismissGuide}
+                >
+                  {t("知道了", "Got it")}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
           <div className="w-px h-4 bg-border" />
           {navItems.map((item) => (
             <Link
