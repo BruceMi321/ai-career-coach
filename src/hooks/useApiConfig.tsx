@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export interface ApiConfig {
   provider: "openai" | "gemini" | "claude" | "azure" | "openrouter";
@@ -7,49 +8,91 @@ export interface ApiConfig {
   model?: string;
 }
 
-export const API_PROVIDERS = [
+interface ApiProviderInfo {
+  id: "openai" | "gemini" | "claude" | "azure" | "openrouter";
+  name: string;
+  descriptionZh: string;
+  descriptionEn: string;
+  baseUrl: string;
+  defaultModel: string;
+  models: string[];
+  requiresBaseUrl?: boolean;
+}
+
+const API_PROVIDERS_DATA: ApiProviderInfo[] = [
   {
-    id: "openai" as const,
+    id: "openai",
     name: "OpenAI",
-    description: "GPT-4o, GPT-4, GPT-3.5等模型",
+    descriptionZh: "GPT-4o, GPT-4, GPT-3.5等模型",
+    descriptionEn: "GPT-4o, GPT-4, GPT-3.5 models",
     baseUrl: "https://api.openai.com/v1",
     defaultModel: "gpt-4o-mini",
     models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"],
   },
   {
-    id: "gemini" as const,
+    id: "gemini",
     name: "Google Gemini",
-    description: "Gemini Pro, Gemini Flash等模型",
+    descriptionZh: "Gemini Pro, Gemini Flash等模型",
+    descriptionEn: "Gemini Pro, Gemini Flash models",
     baseUrl: "https://generativelanguage.googleapis.com/v1beta",
     defaultModel: "gemini-2.0-flash",
     models: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
   },
   {
-    id: "claude" as const,
+    id: "claude",
     name: "Anthropic Claude",
-    description: "Claude 3.5 Sonnet, Claude 3 Opus等模型",
+    descriptionZh: "Claude 3.5 Sonnet, Claude 3 Opus等模型",
+    descriptionEn: "Claude 3.5 Sonnet, Claude 3 Opus models",
     baseUrl: "https://api.anthropic.com/v1",
     defaultModel: "claude-3-5-sonnet-20241022",
     models: ["claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-haiku-20240307"],
   },
   {
-    id: "azure" as const,
+    id: "azure",
     name: "Microsoft Azure AI",
-    description: "Azure OpenAI服务",
+    descriptionZh: "Azure OpenAI服务",
+    descriptionEn: "Azure OpenAI Service",
     baseUrl: "",
     defaultModel: "gpt-4o",
     models: ["gpt-4o", "gpt-4", "gpt-35-turbo"],
     requiresBaseUrl: true,
   },
   {
-    id: "openrouter" as const,
+    id: "openrouter",
     name: "OpenRouter",
-    description: "统一接口访问多种模型",
+    descriptionZh: "统一接口访问多种模型",
+    descriptionEn: "Unified API for multiple models",
     baseUrl: "https://openrouter.ai/api/v1",
     defaultModel: "openai/gpt-4o-mini",
     models: ["openai/gpt-4o", "openai/gpt-4o-mini", "anthropic/claude-3.5-sonnet", "google/gemini-pro"],
   },
 ];
+
+// Helper hook to get localized API providers
+export const useApiProviders = () => {
+  const { language } = useLanguage();
+  
+  return API_PROVIDERS_DATA.map(provider => ({
+    id: provider.id,
+    name: provider.name,
+    description: language === "zh" ? provider.descriptionZh : provider.descriptionEn,
+    baseUrl: provider.baseUrl,
+    defaultModel: provider.defaultModel,
+    models: provider.models,
+    requiresBaseUrl: provider.requiresBaseUrl,
+  }));
+};
+
+// Keep backward compatible export
+export const API_PROVIDERS = API_PROVIDERS_DATA.map(provider => ({
+  id: provider.id,
+  name: provider.name,
+  description: provider.descriptionZh,
+  baseUrl: provider.baseUrl,
+  defaultModel: provider.defaultModel,
+  models: provider.models,
+  requiresBaseUrl: provider.requiresBaseUrl,
+}));
 
 interface ApiConfigContextType {
   configs: ApiConfig[];
