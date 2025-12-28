@@ -93,6 +93,8 @@ const STORAGE_KEY = "career-coach-api-configs";
 const ACTIVE_KEY = "career-coach-active-provider";
 
 export const ApiConfigProvider = ({ children }: { children: ReactNode }) => {
+  console.log("[ApiConfigProvider] Provider mounting...");
+  
   const [configs, setConfigs] = useState<ApiConfig[]>([]);
   const [activeProvider, setActiveProviderState] = useState<string>("");
 
@@ -167,10 +169,12 @@ export const ApiConfigProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useApiConfig = () => {
+  console.log("[useApiConfig] Hook called");
   const context = useContext(ApiConfigContext);
+  console.log("[useApiConfig] Context value:", context ? "found" : "undefined");
+  
   if (context === undefined) {
-    // Fallback to prevent blank screen if provider is missing for any reason.
-    console.warn("useApiConfig used outside ApiConfigProvider");
+    console.warn("[useApiConfig] WARNING: Used outside ApiConfigProvider!");
     return {
       configs: [],
       activeConfig: null,
