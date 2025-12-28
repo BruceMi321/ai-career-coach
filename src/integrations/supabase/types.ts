@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_history: {
+        Row: {
+          analysis_result: Json
+          created_at: string
+          id: string
+          job_description: string
+          resume: string
+          total_score: number | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result: Json
+          created_at?: string
+          id?: string
+          job_description: string
+          resume: string
+          total_score?: number | null
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json
+          created_at?: string
+          id?: string
+          job_description?: string
+          resume?: string
+          total_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      interview_sessions: {
+        Row: {
+          created_at: string
+          feedback: Json | null
+          id: string
+          interview_type: string
+          job_description: string
+          messages: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          interview_type?: string
+          job_description: string
+          messages?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          interview_type?: string
+          job_description?: string
+          messages?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
