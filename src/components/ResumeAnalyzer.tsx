@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useApiConfig } from "@/hooks/useApiConfig";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, FileText, Briefcase, Sparkles, MessageSquare } from "lucide-react";
 import AnalysisResult from "./AnalysisResult";
 import MockInterview from "./MockInterview";
+import ApiRequiredAlert from "./ApiRequiredAlert";
 
 interface AnalysisData {
   totalScore?: number;
@@ -43,6 +45,7 @@ const ResumeAnalyzer = () => {
   const [activeTab, setActiveTab] = useState("analyze");
   const { toast } = useToast();
   const { user } = useAuth();
+  const { activeConfig, hasApiConfig } = useApiConfig();
 
   const handleAnalyze = async () => {
     if (!resume.trim() || !jobDescription.trim()) {
@@ -59,7 +62,7 @@ const ResumeAnalyzer = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("analyze-resume", {
-        body: { resume, jobDescription },
+        body: { resume, jobDescription, apiConfig: activeConfig },
       });
 
       if (error) throw error;
@@ -97,6 +100,8 @@ const ResumeAnalyzer = () => {
 
   return (
     <div className="space-y-8">
+      {!hasApiConfig && <ApiRequiredAlert />}
+      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
           <TabsTrigger value="analyze" className="gap-2">
@@ -164,7 +169,7 @@ const ResumeAnalyzer = () => {
           <div className="flex justify-center">
             <Button
               onClick={handleAnalyze}
-              disabled={isAnalyzing || !resume.trim() || !jobDescription.trim()}
+              disabled={isAnalyzing || !resume.trim() || !jobDescription.trim() || !hasApiConfig}
               size="lg"
               className="min-w-[200px] gap-2"
             >

@@ -64,13 +64,141 @@ const HR_EVALUATION_PROMPT = `你是一位资深的HR专家和职业顾问，拥
   }
 }`;
 
+interface ApiConfig {
+  provider: string;
+  apiKey: string;
+  baseUrl?: string;
+  model?: string;
+}
+
+async function callOpenAI(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const response = await fetch(`${apiConfig.baseUrl || 'https://api.openai.com/v1'}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiConfig.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: apiConfig.model || "gpt-4o-mini",
+      messages,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+  }
+  
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content;
+}
+
+async function callGemini(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const model = apiConfig.model || "gemini-2.0-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiConfig.apiKey}`;
+  
+  // Convert messages to Gemini format
+  const contents = messages
+    .filter(m => m.role !== "system")
+    .map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+  
+  const systemInstruction = messages.find(m => m.role === "system");
+  
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents,
+      systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction.content }] } : undefined,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Gemini API error: ${response.status} - ${error}`);
+  }
+  
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text;
+}
+
+async function callClaude(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const systemMessage = messages.find(m => m.role === "system");
+  const otherMessages = messages.filter(m => m.role !== "system");
+  
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiConfig.apiKey,
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: apiConfig.model || "claude-3-5-sonnet-20241022",
+      max_tokens: 4096,
+      system: systemMessage?.content,
+      messages: otherMessages,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Claude API error: ${response.status} - ${error}`);
+  }
+  
+  const data = await response.json();
+  return data.content?.[0]?.text;
+}
+
+async function callOpenRouter(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiConfig.apiKey}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://career-coach.lovable.app",
+    },
+    body: JSON.stringify({
+      model: apiConfig.model || "openai/gpt-4o-mini",
+      messages,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenRouter API error: ${response.status} - ${error}`);
+  }
+  
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content;
+}
+
+async function callAI(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  switch (apiConfig.provider) {
+    case "openai":
+    case "azure":
+      return callOpenAI(apiConfig, messages);
+    case "gemini":
+      return callGemini(apiConfig, messages);
+    case "claude":
+      return callClaude(apiConfig, messages);
+    case "openrouter":
+      return callOpenRouter(apiConfig, messages);
+    default:
+      throw new Error(`Unsupported provider: ${apiConfig.provider}`);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { resume, jobDescription } = await req.json();
+    const { resume, jobDescription, apiConfig } = await req.json();
     
     if (!resume || !jobDescription) {
       return new Response(
@@ -79,26 +207,20 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!apiConfig || !apiConfig.apiKey) {
+      return new Response(
+        JSON.stringify({ error: "请先配置AI API" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    console.log("Analyzing resume with AI...");
+    console.log(`Analyzing resume with ${apiConfig.provider}...`);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: HR_EVALUATION_PROMPT },
-          { 
-            role: "user", 
-            content: `请分析以下简历与职位的匹配度：
+    const messages = [
+      { role: "system", content: HR_EVALUATION_PROMPT },
+      { 
+        role: "user", 
+        content: `请分析以下简历与职位的匹配度：
 
 ## 目标职位描述（JD）
 ${jobDescription}
@@ -107,33 +229,10 @@ ${jobDescription}
 ${resume}
 
 请按照评估框架进行全面分析，并以JSON格式输出结果。`
-          }
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "请求过于频繁，请稍后再试" }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI服务额度已用尽，请联系管理员" }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      throw new Error(`AI gateway error: ${response.status}`);
-    }
+    ];
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const content = await callAI(apiConfig, messages);
 
     if (!content) {
       throw new Error("No content in AI response");
@@ -142,14 +241,12 @@ ${resume}
     // Try to parse JSON from the response
     let analysisResult;
     try {
-      // Extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || 
                         content.match(/```\n?([\s\S]*?)\n?```/);
       const jsonStr = jsonMatch ? jsonMatch[1] : content;
       analysisResult = JSON.parse(jsonStr.trim());
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON:", parseError);
-      // Return the raw content if JSON parsing fails
       analysisResult = { 
         rawAnalysis: content,
         parseError: true 

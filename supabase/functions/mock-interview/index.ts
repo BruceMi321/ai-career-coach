@@ -26,20 +26,231 @@ const INTERVIEWER_PROMPT = `你是一位资深的面试官，拥有丰富的招�
 - 如果候选人回答了问题，给予简短评价并追问或提出新问题
 - 保持对话自然流畅`;
 
+interface ApiConfig {
+  provider: string;
+  apiKey: string;
+  baseUrl?: string;
+  model?: string;
+}
+
+async function streamOpenAI(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const response = await fetch(`${apiConfig.baseUrl || 'https://api.openai.com/v1'}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiConfig.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: apiConfig.model || "gpt-4o-mini",
+      messages,
+      stream: true,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+  }
+  
+  return response;
+}
+
+async function streamGemini(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const model = apiConfig.model || "gemini-2.0-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiConfig.apiKey}&alt=sse`;
+  
+  const contents = messages
+    .filter(m => m.role !== "system")
+    .map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+  
+  const systemInstruction = messages.find(m => m.role === "system");
+  
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents,
+      systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction.content }] } : undefined,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Gemini API error: ${response.status} - ${error}`);
+  }
+  
+  // Transform Gemini SSE to OpenAI-compatible SSE
+  const reader = response.body?.getReader();
+  const encoder = new TextEncoder();
+  
+  const stream = new ReadableStream({
+    async pull(controller) {
+      if (!reader) {
+        controller.close();
+        return;
+      }
+      
+      const { done, value } = await reader.read();
+      if (done) {
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+        return;
+      }
+      
+      const text = new TextDecoder().decode(value);
+      const lines = text.split("\n");
+      
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (content) {
+              const openaiFormat = {
+                choices: [{ delta: { content } }]
+              };
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(openaiFormat)}\n\n`));
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      }
+    }
+  });
+  
+  return new Response(stream, {
+    headers: { "Content-Type": "text/event-stream" }
+  });
+}
+
+async function streamClaude(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const systemMessage = messages.find(m => m.role === "system");
+  const otherMessages = messages.filter(m => m.role !== "system");
+  
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiConfig.apiKey,
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: apiConfig.model || "claude-3-5-sonnet-20241022",
+      max_tokens: 4096,
+      stream: true,
+      system: systemMessage?.content,
+      messages: otherMessages,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Claude API error: ${response.status} - ${error}`);
+  }
+  
+  // Transform Claude SSE to OpenAI-compatible SSE
+  const reader = response.body?.getReader();
+  const encoder = new TextEncoder();
+  
+  const stream = new ReadableStream({
+    async pull(controller) {
+      if (!reader) {
+        controller.close();
+        return;
+      }
+      
+      const { done, value } = await reader.read();
+      if (done) {
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+        return;
+      }
+      
+      const text = new TextDecoder().decode(value);
+      const lines = text.split("\n");
+      
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === "content_block_delta" && data.delta?.text) {
+              const openaiFormat = {
+                choices: [{ delta: { content: data.delta.text } }]
+              };
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(openaiFormat)}\n\n`));
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      }
+    }
+  });
+  
+  return new Response(stream, {
+    headers: { "Content-Type": "text/event-stream" }
+  });
+}
+
+async function streamOpenRouter(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiConfig.apiKey}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://career-coach.lovable.app",
+    },
+    body: JSON.stringify({
+      model: apiConfig.model || "openai/gpt-4o-mini",
+      messages,
+      stream: true,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenRouter API error: ${response.status} - ${error}`);
+  }
+  
+  return response;
+}
+
+async function streamAI(apiConfig: ApiConfig, messages: Array<{role: string; content: string}>) {
+  switch (apiConfig.provider) {
+    case "openai":
+    case "azure":
+      return streamOpenAI(apiConfig, messages);
+    case "gemini":
+      return streamGemini(apiConfig, messages);
+    case "claude":
+      return streamClaude(apiConfig, messages);
+    case "openrouter":
+      return streamOpenRouter(apiConfig, messages);
+    default:
+      throw new Error(`Unsupported provider: ${apiConfig.provider}`);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages, jobDescription, interviewType = 'behavioral' } = await req.json();
+    const { messages, jobDescription, interviewType = 'behavioral', apiConfig } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!apiConfig || !apiConfig.apiKey) {
+      return new Response(
+        JSON.stringify({ error: "请先配置AI API" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    console.log(`Starting mock interview - type: ${interviewType}`);
+    console.log(`Starting mock interview with ${apiConfig.provider} - type: ${interviewType}`);
 
     const systemMessage = `${INTERVIEWER_PROMPT}
 
@@ -49,41 +260,12 @@ ${jobDescription}
 ## 当前面试类型
 ${interviewType}`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemMessage },
-          ...messages
-        ],
-        stream: true,
-      }),
-    });
+    const fullMessages = [
+      { role: "system", content: systemMessage },
+      ...messages
+    ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "请求过于频繁，请稍后再试" }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI服务额度已用尽" }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      throw new Error(`AI gateway error: ${response.status}`);
-    }
+    const response = await streamAI(apiConfig, fullMessages);
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },

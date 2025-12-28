@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useApiConfig } from "@/hooks/useApiConfig";
 import { Loader2, Send, MessageSquare, User, Bot, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -33,6 +34,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { activeConfig, hasApiConfig } = useApiConfig();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -45,6 +47,15 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
       toast({
         title: "请先填写职位描述",
         description: "需要职位描述才能开始模拟面试",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!hasApiConfig || !activeConfig) {
+      toast({
+        title: "请先配置AI API",
+        description: "需要配置API才能使用面试功能",
         variant: "destructive",
       });
       return;
@@ -66,6 +77,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
             messages: [{ role: "user", content: "请开始面试" }],
             jobDescription,
             interviewType,
+            apiConfig: activeConfig,
           }),
         }
       );
@@ -148,6 +160,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
             messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
             jobDescription,
             interviewType,
+            apiConfig: activeConfig,
           }),
         }
       );
@@ -215,7 +228,7 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
           <Button 
             onClick={startInterview} 
             className="w-full gap-2"
-            disabled={!jobDescription.trim() || isLoading}
+            disabled={!jobDescription.trim() || isLoading || !hasApiConfig}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
