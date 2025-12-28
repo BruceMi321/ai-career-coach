@@ -79,6 +79,23 @@ const Pricing = () => {
         throw error;
       }
 
+      // Send email notification (fire and forget - don't block on failure)
+      try {
+        await supabase.functions.invoke('send-reservation-notification', {
+          body: {
+            company_name: formData.companyName,
+            contact_name: formData.contactName,
+            email: formData.email,
+            phone: formData.phone || null,
+            team_size: formData.teamSize || null,
+            message: formData.message || null,
+          }
+        });
+      } catch (notificationError) {
+        console.error("Failed to send notification:", notificationError);
+        // Don't throw - notification failure shouldn't affect reservation success
+      }
+
       toast({
         title: t("预约成功！", "Reservation Successful!"),
         description: t(
