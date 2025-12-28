@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 
 const authSchema = z.object({
@@ -79,20 +80,31 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/30 rounded-full blur-3xl" />
       </div>
 
+      <div className="w-full max-w-md mb-4">
+        <Link to="/">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            返回主页
+          </Button>
+        </Link>
+      </div>
+
       <Card className="w-full max-w-md border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <Sparkles className="h-6 w-6 text-primary-foreground" />
-            </div>
+            <span className="text-xl font-bold tracking-tight">
+              <span className="font-light">your</span>
+              <span className="font-bold italic">way</span>
+              <span className="font-light">career</span>
+            </span>
           </div>
-          <CardTitle className="text-2xl">职业发展教练</CardTitle>
+          <CardTitle className="text-2xl">欢迎使用</CardTitle>
           <CardDescription>登录或注册以保存您的分析记录</CardDescription>
         </CardHeader>
         <CardContent>
