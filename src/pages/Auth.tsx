@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,13 +13,6 @@ import { Link } from "react-router-dom";
 import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
 
-const authSchema = z.object({
-  email: z.string().email("请输入有效的邮箱地址"),
-  password: z.string().min(6, "密码至少6个字符"),
-});
-
-const emailSchema = z.string().email("请输入有效的邮箱地址");
-
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,9 +20,17 @@ const Auth = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { user, signUp, signIn, signInWithGoogle, resetPassword } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  const authSchema = z.object({
+    email: z.string().email(t("请输入有效的邮箱地址", "Please enter a valid email")),
+    password: z.string().min(6, t("密码至少6个字符", "Password must be at least 6 characters")),
+  });
+
+  const emailSchema = z.string().email(t("请输入有效的邮箱地址", "Please enter a valid email"));
 
   useEffect(() => {
     if (user) {
@@ -39,17 +41,17 @@ const Auth = () => {
   useEffect(() => {
     if (searchParams.get("reset") === "true") {
       toast({
-        title: "密码重置",
-        description: "请在邮件中点击链接重置密码",
+        title: t("密码重置", "Password Reset"),
+        description: t("请在邮件中点击链接重置密码", "Please click the link in your email to reset password"),
       });
     }
-  }, [searchParams, toast]);
+  }, [searchParams, toast, t]);
 
   const handleAuth = async (type: "login" | "signup") => {
     const result = authSchema.safeParse({ email, password });
     if (!result.success) {
       toast({
-        title: "输入错误",
+        title: t("输入错误", "Input Error"),
         description: result.error.errors[0].message,
         variant: "destructive",
       });
@@ -66,26 +68,26 @@ const Auth = () => {
       if (error) {
         let message = error.message;
         if (error.message.includes("User already registered")) {
-          message = "该邮箱已注册，请直接登录";
+          message = t("该邮箱已注册，请直接登录", "Email already registered, please sign in");
         } else if (error.message.includes("Invalid login credentials")) {
-          message = "邮箱或密码错误";
+          message = t("邮箱或密码错误", "Invalid email or password");
         }
         toast({
-          title: type === "login" ? "登录失败" : "注册失败",
+          title: type === "login" ? t("登录失败", "Login Failed") : t("注册失败", "Registration Failed"),
           description: message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: type === "login" ? "登录成功" : "注册成功",
-          description: type === "login" ? "欢迎回来！" : "账号创建成功，欢迎使用！",
+          title: type === "login" ? t("登录成功", "Login Successful") : t("注册成功", "Registration Successful"),
+          description: type === "login" ? t("欢迎回来！", "Welcome back!") : t("账号创建成功，欢迎使用！", "Account created successfully!"),
         });
         navigate("/");
       }
     } catch (err) {
       toast({
-        title: "错误",
-        description: "操作失败，请稍后重试",
+        title: t("错误", "Error"),
+        description: t("操作失败，请稍后重试", "Operation failed, please try again"),
         variant: "destructive",
       });
     } finally {
@@ -99,15 +101,15 @@ const Auth = () => {
       const { error } = await signInWithGoogle();
       if (error) {
         toast({
-          title: "登录失败",
+          title: t("登录失败", "Login Failed"),
           description: error.message,
           variant: "destructive",
         });
       }
     } catch (err) {
       toast({
-        title: "错误",
-        description: "Google 登录失败，请稍后重试",
+        title: t("错误", "Error"),
+        description: t("Google 登录失败，请稍后重试", "Google login failed, please try again"),
         variant: "destructive",
       });
     } finally {
@@ -119,8 +121,8 @@ const Auth = () => {
     const result = emailSchema.safeParse(email);
     if (!result.success) {
       toast({
-        title: "输入错误",
-        description: "请输入有效的邮箱地址",
+        title: t("输入错误", "Input Error"),
+        description: t("请输入有效的邮箱地址", "Please enter a valid email"),
         variant: "destructive",
       });
       return;
@@ -131,21 +133,21 @@ const Auth = () => {
       const { error } = await resetPassword(email);
       if (error) {
         toast({
-          title: "发送失败",
+          title: t("发送失败", "Send Failed"),
           description: error.message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "邮件已发送",
-          description: "请查看您的邮箱，点击链接重置密码",
+          title: t("邮件已发送", "Email Sent"),
+          description: t("请查看您的邮箱，点击链接重置密码", "Check your inbox and click the link to reset password"),
         });
         setShowForgotPassword(false);
       }
     } catch (err) {
       toast({
-        title: "错误",
-        description: "操作失败，请稍后重试",
+        title: t("错误", "Error"),
+        description: t("操作失败，请稍后重试", "Operation failed, please try again"),
         variant: "destructive",
       });
     } finally {
@@ -164,7 +166,7 @@ const Auth = () => {
         <Link to="/">
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            返回主页
+            {t("返回主页", "Back to Home")}
           </Button>
         </Link>
       </div>
@@ -179,19 +181,19 @@ const Auth = () => {
             </span>
           </div>
           <CardTitle className="text-2xl">
-            {showForgotPassword ? "重置密码" : "欢迎使用"}
+            {showForgotPassword ? t("重置密码", "Reset Password") : t("欢迎使用", "Welcome")}
           </CardTitle>
           <CardDescription>
             {showForgotPassword 
-              ? "输入您的邮箱，我们将发送重置链接" 
-              : "登录或注册以保存您的分析记录"}
+              ? t("输入您的邮箱，我们将发送重置链接", "Enter your email and we'll send a reset link")
+              : t("登录或注册以保存您的分析记录", "Sign in or register to save your analysis history")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {showForgotPassword ? (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="reset-email">邮箱</Label>
+                <Label htmlFor="reset-email">{t("邮箱", "Email")}</Label>
                 <Input
                   id="reset-email"
                   type="email"
@@ -210,10 +212,10 @@ const Auth = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    发送中...
+                    {t("发送中...", "Sending...")}
                   </>
                 ) : (
-                  "发送重置链接"
+                  t("发送重置链接", "Send Reset Link")
                 )}
               </Button>
               <Button 
@@ -221,7 +223,7 @@ const Auth = () => {
                 className="w-full" 
                 onClick={() => setShowForgotPassword(false)}
               >
-                返回登录
+                {t("返回登录", "Back to Login")}
               </Button>
             </div>
           ) : (
@@ -255,7 +257,7 @@ const Auth = () => {
                     />
                   </svg>
                 )}
-                使用 Google 登录
+                {t("使用 Google 登录", "Sign in with Google")}
               </Button>
 
               <div className="relative mb-4">
@@ -263,19 +265,19 @@ const Auth = () => {
                   <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">或</span>
+                  <span className="bg-card px-2 text-muted-foreground">{t("或", "or")}</span>
                 </div>
               </div>
 
               <Tabs defaultValue="login" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">登录</TabsTrigger>
-                  <TabsTrigger value="signup">注册</TabsTrigger>
+                  <TabsTrigger value="login">{t("登录", "Sign In")}</TabsTrigger>
+                  <TabsTrigger value="signup">{t("注册", "Sign Up")}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="login" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">邮箱</Label>
+                    <Label htmlFor="login-email">{t("邮箱", "Email")}</Label>
                     <Input
                       id="login-email"
                       type="email"
@@ -287,13 +289,13 @@ const Auth = () => {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="login-password">密码</Label>
+                      <Label htmlFor="login-password">{t("密码", "Password")}</Label>
                       <Button
                         variant="link"
                         className="px-0 h-auto text-xs text-muted-foreground"
                         onClick={() => setShowForgotPassword(true)}
                       >
-                        忘记密码？
+                        {t("忘记密码？", "Forgot password?")}
                       </Button>
                     </div>
                     <Input
@@ -314,17 +316,17 @@ const Auth = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        登录中...
+                        {t("登录中...", "Signing in...")}
                       </>
                     ) : (
-                      "登录"
+                      t("登录", "Sign In")
                     )}
                   </Button>
                 </TabsContent>
 
                 <TabsContent value="signup" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">邮箱</Label>
+                    <Label htmlFor="signup-email">{t("邮箱", "Email")}</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -335,11 +337,11 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">密码</Label>
+                    <Label htmlFor="signup-password">{t("密码", "Password")}</Label>
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="至少6个字符"
+                      placeholder={t("至少6个字符", "At least 6 characters")}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
@@ -354,10 +356,10 @@ const Auth = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        注册中...
+                        {t("注册中...", "Signing up...")}
                       </>
                     ) : (
-                      "创建账号"
+                      t("创建账号", "Create Account")
                     )}
                   </Button>
                 </TabsContent>

@@ -7,30 +7,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 
-const formSchema = z.object({
-  name: z.string().trim().min(1, "请输入名字"),
-  surname: z.string().trim().min(1, "请输入姓氏"),
-  company: z.string().optional(),
-  email: z.string().trim().email("请输入有效的邮箱地址"),
-  phone: z.string().trim().min(1, "请输入电话号码"),
-  helpMessage: z.string().trim().min(1, "请描述您需要的帮助"),
-  hearAboutUs: z.string().min(1, "请选择您是如何了解我们的"),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const hearAboutUsOptions = [
-  { value: "search", label: "搜索引擎" },
-  { value: "social", label: "社交媒体" },
-  { value: "friend", label: "朋友推荐" },
-  { value: "advertisement", label: "广告" },
-  { value: "other", label: "其他" },
-];
-
 const ContactExpert = () => {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const formSchema = z.object({
+    name: z.string().trim().min(1, t("请输入名字", "Please enter your first name")),
+    surname: z.string().trim().min(1, t("请输入姓氏", "Please enter your last name")),
+    company: z.string().optional(),
+    email: z.string().trim().email(t("请输入有效的邮箱地址", "Please enter a valid email")),
+    phone: z.string().trim().min(1, t("请输入电话号码", "Please enter your phone number")),
+    helpMessage: z.string().trim().min(1, t("请描述您需要的帮助", "Please describe how we can help")),
+    hearAboutUs: z.string().min(1, t("请选择您是如何了解我们的", "Please select how you heard about us")),
+  });
+
+  type FormData = z.infer<typeof formSchema>;
+
+  const hearAboutUsOptions = [
+    { value: "search", label: t("搜索引擎", "Search Engine") },
+    { value: "social", label: t("社交媒体", "Social Media") },
+    { value: "friend", label: t("朋友推荐", "Friend Referral") },
+    { value: "advertisement", label: t("广告", "Advertisement") },
+    { value: "other", label: t("其他", "Other") },
+  ];
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     surname: "",
@@ -41,8 +46,6 @@ const ContactExpert = () => {
     hearAboutUs: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -54,7 +57,7 @@ const ContactExpert = () => {
     const result = formSchema.safeParse(formData);
     if (!result.success) {
       toast({
-        title: "表单错误",
+        title: t("表单错误", "Form Error"),
         description: result.error.errors[0].message,
         variant: "destructive",
       });
@@ -67,8 +70,8 @@ const ContactExpert = () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     toast({
-      title: "提交成功",
-      description: "我们的专家将尽快与您联系！",
+      title: t("提交成功", "Submitted Successfully"),
+      description: t("我们的专家将尽快与您联系！", "Our expert will contact you soon!"),
     });
 
     setIsLoading(false);
@@ -86,7 +89,7 @@ const ContactExpert = () => {
         <Link to="/">
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            返回主页
+            {t("返回主页", "Back to Home")}
           </Button>
         </Link>
       </div>
@@ -100,19 +103,19 @@ const ContactExpert = () => {
               <span className="font-light">career</span>
             </span>
           </div>
-          <CardTitle className="text-2xl">联系职业专家</CardTitle>
-          <CardDescription>填写表单，我们的专家将尽快与您联系</CardDescription>
+          <CardTitle className="text-2xl">{t("联系职业专家", "Contact an Expert")}</CardTitle>
+          <CardDescription>{t("填写表单，我们的专家将尽快与您联系", "Fill out the form and our expert will contact you soon")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">
-                  名字 <span className="text-destructive">*</span>
+                  {t("名字", "First Name")} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="name"
-                  placeholder="请输入名字"
+                  placeholder={t("请输入名字", "Enter first name")}
                   value={formData.name}
                   onChange={(e) => handleChange("name", e.target.value)}
                   disabled={isLoading}
@@ -120,11 +123,11 @@ const ContactExpert = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="surname">
-                  姓氏 <span className="text-destructive">*</span>
+                  {t("姓氏", "Last Name")} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="surname"
-                  placeholder="请输入姓氏"
+                  placeholder={t("请输入姓氏", "Enter last name")}
                   value={formData.surname}
                   onChange={(e) => handleChange("surname", e.target.value)}
                   disabled={isLoading}
@@ -133,10 +136,10 @@ const ContactExpert = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="company">公司</Label>
+              <Label htmlFor="company">{t("公司", "Company")}</Label>
               <Input
                 id="company"
-                placeholder="请输入公司名称（选填）"
+                placeholder={t("请输入公司名称（选填）", "Enter company name (optional)")}
                 value={formData.company}
                 onChange={(e) => handleChange("company", e.target.value)}
                 disabled={isLoading}
@@ -145,7 +148,7 @@ const ContactExpert = () => {
 
             <div className="space-y-2">
               <Label htmlFor="email">
-                邮箱 <span className="text-destructive">*</span>
+                {t("邮箱", "Email")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="email"
@@ -159,12 +162,12 @@ const ContactExpert = () => {
 
             <div className="space-y-2">
               <Label htmlFor="phone">
-                电话号码 <span className="text-destructive">*</span>
+                {t("电话号码", "Phone Number")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="请输入电话号码"
+                placeholder={t("请输入电话号码", "Enter phone number")}
                 value={formData.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 disabled={isLoading}
@@ -173,11 +176,11 @@ const ContactExpert = () => {
 
             <div className="space-y-2">
               <Label htmlFor="helpMessage">
-                我们如何帮助您？ <span className="text-destructive">*</span>
+                {t("我们如何帮助您？", "How can we help you?")} <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="helpMessage"
-                placeholder="请描述您需要的帮助..."
+                placeholder={t("请描述您需要的帮助...", "Describe how we can help...")}
                 value={formData.helpMessage}
                 onChange={(e) => handleChange("helpMessage", e.target.value)}
                 disabled={isLoading}
@@ -187,7 +190,7 @@ const ContactExpert = () => {
 
             <div className="space-y-2">
               <Label htmlFor="hearAboutUs">
-                您是如何了解我们的？ <span className="text-destructive">*</span>
+                {t("您是如何了解我们的？", "How did you hear about us?")} <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={formData.hearAboutUs}
@@ -195,7 +198,7 @@ const ContactExpert = () => {
                 disabled={isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="请选择" />
+                  <SelectValue placeholder={t("请选择", "Please select")} />
                 </SelectTrigger>
                 <SelectContent>
                   {hearAboutUsOptions.map((option) => (
@@ -211,10 +214,10 @@ const ContactExpert = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  提交中...
+                  {t("提交中...", "Submitting...")}
                 </>
               ) : (
-                "提交"
+                t("提交", "Submit")
               )}
             </Button>
           </form>
