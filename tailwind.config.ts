@@ -108,6 +108,18 @@ export default {
 				'Noto Sans',
 				'sans-serif'
 			],
+			display: [
+				'Bebas Neue',
+				'ui-sans-serif',
+				'system-ui',
+				'sans-serif'
+			],
+			heading: [
+				'Poppins',
+				'ui-sans-serif',
+				'system-ui',
+				'sans-serif'
+			],
 			serif: [
 				'Playfair Display',
 				'ui-serif',
