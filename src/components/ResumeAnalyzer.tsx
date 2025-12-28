@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApiConfig } from "@/hooks/useApiConfig";
+import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, FileText, Briefcase, Sparkles, MessageSquare } from "lucide-react";
 import AnalysisResult from "./AnalysisResult";
@@ -46,12 +47,13 @@ const ResumeAnalyzer = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { activeConfig, hasApiConfig } = useApiConfig();
+  const { t } = useLanguage();
 
   const handleAnalyze = async () => {
     if (!resume.trim() || !jobDescription.trim()) {
       toast({
-        title: "请填写完整信息",
-        description: "简历和职位描述都是必填项",
+        title: t("请填写完整信息", "Please fill in all fields"),
+        description: t("简历和职位描述都是必填项", "Resume and job description are required"),
         variant: "destructive",
       });
       return;
@@ -82,15 +84,17 @@ const ResumeAnalyzer = () => {
         }
 
         toast({
-          title: "分析完成",
-          description: user ? "评估报告已生成并保存" : "评估报告已生成，登录后可保存历史记录",
+          title: t("分析完成", "Analysis Complete"),
+          description: user 
+            ? t("评估报告已生成并保存", "Report generated and saved")
+            : t("评估报告已生成，登录后可保存历史记录", "Report generated. Sign in to save history"),
         });
       }
     } catch (error) {
       console.error("Analysis error:", error);
       toast({
-        title: "分析失败",
-        description: error instanceof Error ? error.message : "请稍后重试",
+        title: t("分析失败", "Analysis Failed"),
+        description: error instanceof Error ? error.message : t("请稍后重试", "Please try again later"),
         variant: "destructive",
       });
     } finally {
@@ -106,11 +110,11 @@ const ResumeAnalyzer = () => {
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto h-12 bg-muted/50 p-1">
           <TabsTrigger value="analyze" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <Sparkles className="h-4 w-4" />
-            简历分析
+            {t("简历分析", "Resume Analysis")}
           </TabsTrigger>
           <TabsTrigger value="interview" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <MessageSquare className="h-4 w-4" />
-            模拟面试
+            {t("模拟面试", "Mock Interview")}
           </TabsTrigger>
         </TabsList>
 
@@ -122,19 +126,26 @@ const ResumeAnalyzer = () => {
                   <div className="h-8 w-8 rounded flex items-center justify-center bg-primary/10">
                     <Briefcase className="h-4 w-4 text-primary" />
                   </div>
-                  目标职位描述
+                  {t("目标职位描述", "Target Job Description")}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  粘贴您想要申请的职位描述
+                  {t("粘贴您想要申请的职位描述", "Paste the job description you're applying for")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Textarea
-                  placeholder="请粘贴职位描述，包括：
+                  placeholder={t(
+                    `请粘贴职位描述，包括：
 • 岗位职责
 • 任职要求
 • 技能要求
-• 学历要求等..."
+• 学历要求等...`,
+                    `Paste the job description, including:
+• Responsibilities
+• Requirements
+• Skills needed
+• Education requirements...`
+                  )}
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   className="min-h-[280px] resize-none border-border focus:border-primary focus:ring-1 focus:ring-primary"
@@ -148,20 +159,28 @@ const ResumeAnalyzer = () => {
                   <div className="h-8 w-8 rounded flex items-center justify-center bg-primary/10">
                     <FileText className="h-4 w-4 text-primary" />
                   </div>
-                  个人简历
+                  {t("个人简历", "Your Resume")}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  粘贴您的简历内容
+                  {t("粘贴您的简历内容", "Paste your resume content")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Textarea
-                  placeholder="请粘贴您的简历内容，包括：
+                  placeholder={t(
+                    `请粘贴您的简历内容，包括：
 • 个人信息
 • 教育背景
 • 工作经历
 • 项目经验
-• 技能特长等..."
+• 技能特长等...`,
+                    `Paste your resume content, including:
+• Personal info
+• Education
+• Work experience
+• Projects
+• Skills...`
+                  )}
                   value={resume}
                   onChange={(e) => setResume(e.target.value)}
                   className="min-h-[280px] resize-none border-border focus:border-primary focus:ring-1 focus:ring-primary"
@@ -181,12 +200,12 @@ const ResumeAnalyzer = () => {
               {isAnalyzing ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  AI 正在分析...
+                  {t("AI 正在分析...", "AI Analyzing...")}
                 </>
               ) : (
                 <>
                   <Sparkles className="h-5 w-5" />
-                  开始智能分析
+                  {t("开始智能分析", "Start AI Analysis")}
                 </>
               )}
             </Button>
@@ -203,15 +222,15 @@ const ResumeAnalyzer = () => {
                   <div className="h-8 w-8 rounded flex items-center justify-center bg-primary/10">
                     <Briefcase className="h-4 w-4 text-primary" />
                   </div>
-                  目标职位描述
+                  {t("目标职位描述", "Target Job Description")}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  面试官将根据此职位进行提问
+                  {t("面试官将根据此职位进行提问", "Interviewer will ask questions based on this job")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Textarea
-                  placeholder="请粘贴职位描述..."
+                  placeholder={t("请粘贴职位描述...", "Paste job description...")}
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   className="min-h-[200px] resize-none border-border focus:border-primary focus:ring-1 focus:ring-primary"
