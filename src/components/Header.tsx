@@ -268,27 +268,6 @@ const Header = () => {
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-border bg-background">
           <nav className="container px-4 py-4 space-y-1">
-            {/* Quick access buttons at top */}
-            <div className="flex gap-2 pb-3 border-b border-border mb-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 gap-1.5 h-9"
-                onClick={() => scrollToFeature("analyze")}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                {t("简历分析", "Resume")}
-              </Button>
-              <Button
-                size="sm"
-                className="flex-1 gap-1.5 h-9"
-                onClick={() => scrollToFeature("interview")}
-              >
-                <MessageSquare className="h-3.5 w-3.5" />
-                {t("面试", "Interview")}
-              </Button>
-            </div>
-
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -313,45 +292,6 @@ const Header = () => {
             >
               {t("帮助中心", "Help")}
             </Link>
-            
-            <div className="pt-4 border-t border-border mt-4 space-y-2">
-              {!user && (
-                <>
-                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full" size="sm">
-                      {t("登录", "Sign In")}
-                    </Button>
-                  </Link>
-                  <Link to="/contact-expert" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full" size="sm">
-                      {t("专家咨询", "Expert Consultation")}
-                    </Button>
-                  </Link>
-                </>
-              )}
-
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-xs text-muted-foreground">{t("语言", "Language")}</span>
-                <div className="flex gap-2">
-                  <Button 
-                    variant={language === "zh" ? "secondary" : "ghost"} 
-                    size="sm" 
-                    className="h-7 text-xs"
-                    onClick={() => setLanguage("zh")}
-                  >
-                    中文
-                  </Button>
-                  <Button 
-                    variant={language === "en" ? "secondary" : "ghost"} 
-                    size="sm" 
-                    className="h-7 text-xs"
-                    onClick={() => setLanguage("en")}
-                  >
-                    EN
-                  </Button>
-                </div>
-              </div>
-            </div>
           </nav>
         </div>
       )}
