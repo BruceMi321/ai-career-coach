@@ -93,7 +93,6 @@ const STORAGE_KEY = "career-coach-api-configs";
 const ACTIVE_KEY = "career-coach-active-provider";
 
 export const ApiConfigProvider = ({ children }: { children: ReactNode }) => {
-  console.log("[ApiConfigProvider] Provider mounting...");
   
   const [configs, setConfigs] = useState<ApiConfig[]>([]);
   const [activeProvider, setActiveProviderState] = useState<string>("");
@@ -169,12 +168,9 @@ export const ApiConfigProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useApiConfig = () => {
-  console.log("[useApiConfig] Hook called");
   const context = useContext(ApiConfigContext);
-  console.log("[useApiConfig] Context value:", context ? "found" : "undefined");
   
   if (context === undefined) {
-    console.warn("[useApiConfig] WARNING: Used outside ApiConfigProvider!");
     return {
       configs: [],
       activeConfig: null,
