@@ -10,6 +10,7 @@ import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrollToTop from "@/components/ScrollToTop";
+import WelcomeDialog from "@/components/WelcomeDialog";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const Index = () => {
@@ -50,6 +51,7 @@ const Index = () => {
       </main>
       <Footer />
       <ScrollToTop />
+      <WelcomeDialog />
     </div>
   );
 };
