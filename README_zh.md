@@ -1,14 +1,8 @@
-# 🇨🇳 AI Career Coach — 中文版 README
-
 # 🧭 AI Career Coach  
 **AI Career Coach** 是一个基于人工智能的职业发展辅助工具，旨在帮助求职者和职场人士更高效地规划职业路径、优化求职材料，并提升面试表现。通过智能分析与个性化建议，它能够在职业发展过程中提供持续支持。
 
----
-
 ## 🌟 项目简介
 AI Career Coach 利用先进的自然语言处理（NLP）与大语言模型（LLM）技术，为用户提供从求职准备到职业规划的全流程智能支持。无论你是正在找工作、准备转行，还是希望提升职业竞争力，它都能成为你的 AI 职业伙伴。
-
----
 
 ## 🚀 核心功能
 
@@ -37,8 +31,6 @@ AI Career Coach 利用先进的自然语言处理（NLP）与大语言模型（L
 - 支持多语言输出  
 - 提供专业级润色  
 
----
-
 ## 👥 适用人群
 - 求职学生、应届毕业生  
 - 想要转行的职场人士  
@@ -46,16 +38,12 @@ AI Career Coach 利用先进的自然语言处理（NLP）与大语言模型（L
 - HR、招聘人员、职业教练  
 - 需要快速生成或优化求职材料的用户  
 
----
-
 ## 🛠 技术栈（示例，可按你的项目实际情况调整）
 - Python / Node.js / TypeScript  
 - NLP / LLM（如 GPT 系列模型）  
 - FastAPI / Express  
 - Docker / GitHub Actions  
 - Vector DB（如 Pinecone / Chroma）  
-
----
 
 ## 📦 项目结构（示例）
 ```
@@ -69,8 +57,6 @@ ai-career-coach/
 └── README_zh.md         # 中文版 README（本文件）
 ```
 
----
-
 ## 🧪 使用示例（示意）
 ```bash
 # 安装依赖
@@ -80,13 +66,10 @@ pip install -r requirements.txt
 python app.py
 ```
 
----
-
 ## 🤝 贡献指南
 欢迎提交 Issue 或 Pull Request。  
 如果你有新的功能想法、Bug 反馈或改进建议，欢迎参与贡献。
 
----
 
 ## 📄 许可证
 本项目采用 MIT License。
