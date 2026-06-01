@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApiConfig } from "@/hooks/useApiConfig";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Loader2, Send, MessageSquare, User, Bot, Play } from "lucide-react";
+import { Loader2, Send, MessageSquare, User, Bot, Play, AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
@@ -191,29 +191,29 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
 
   if (!isStarted) {
     return (
-      <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2.5 text-lg font-serif">
             <MessageSquare className="h-5 w-5 text-primary" />
             {t("AI 模拟面试", "AI Mock Interview")}
           </CardTitle>
           <CardDescription>
-            {t("选择面试类型，开始模拟面试练习", "Select interview type and start practicing")}
+            {t("选择面试类型，开始进行沉浸式求职面试模拟练习", "Select interview type and start practicing")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("面试类型", "Interview Type")}</label>
+            <label className="text-sm font-medium text-muted-foreground">{t("面试类型", "Interview Type")}</label>
             <Select value={interviewType} onValueChange={setInterviewType}>
-              <SelectTrigger>
+              <SelectTrigger className="border-border/60 focus:ring-primary focus:border-primary">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-w-[350px]">
                 {INTERVIEW_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    <div>
-                      <div className="font-medium">{type.label}</div>
-                      <div className="text-xs text-muted-foreground">{type.description}</div>
+                  <SelectItem key={type.value} value={type.value} className="focus:bg-muted py-2.5">
+                    <div className="space-y-0.5">
+                      <div className="font-semibold text-sm text-foreground">{type.label}</div>
+                      <div className="text-xs text-muted-foreground leading-normal">{type.description}</div>
                     </div>
                   </SelectItem>
                 ))}
@@ -222,20 +222,24 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
           </div>
 
           {!jobDescription.trim() && (
-            <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/50 p-3 rounded-lg">
-              {t("请先在上方填写职位描述，然后开始模拟面试", "Please fill in job description above first, then start mock interview")}
-            </p>
+            <div className="flex gap-2.5 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200/50 dark:border-amber-900/30 animate-pulse-glow">
+              <AlertCircle className="h-5 w-5 shrink-0" />
+              <span className="leading-relaxed">
+                {t("请先在左侧输入您的目标职位描述（JD），然后即可开启专属 AI 面试模拟！", "Please input target job description on the left first to enable mock interview.")}
+              </span>
+            </div>
           )}
 
           <Button 
             onClick={startInterview} 
-            className="w-full gap-2"
+            variant="premium"
+            className="w-full gap-2 py-6 text-base font-medium shadow-sm transition-all duration-300"
             disabled={!jobDescription.trim() || isLoading || !hasApiConfig}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Play className="h-4 w-4" />
+              <Play className="h-4 w-4 fill-current" />
             )}
             {t("开始模拟面试", "Start Mock Interview")}
           </Button>
@@ -245,66 +249,70 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
   }
 
   return (
-    <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-primary" />
+    <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg flex flex-col h-[550px] overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/40 shrink-0">
+        <div className="space-y-0.5">
+          <CardTitle className="flex items-center gap-2.5 text-lg font-serif">
+            <Bot className="h-5 w-5 text-primary animate-icon-bounce" />
             {t("模拟面试进行中", "Interview in Progress")}
           </CardTitle>
-          <CardDescription>
-            {INTERVIEW_TYPES.find(type => type.value === interviewType)?.label}
+          <CardDescription className="text-xs">
+            {t("当前类型：", "Type: ")}
+            <span className="font-semibold text-primary">
+              {INTERVIEW_TYPES.find(type => type.value === interviewType)?.label}
+            </span>
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={resetInterview}>
+        <Button variant="outline" size="sm" onClick={resetInterview} className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-colors">
           {t("结束面试", "End Interview")}
         </Button>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <ScrollArea className="h-[400px] pr-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
+
+      <CardContent className="flex-1 p-4 overflow-hidden flex flex-col min-h-0">
+        <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
+          <div className="space-y-4 pb-4">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}
+                className={`flex gap-3 animate-card-enter ${message.role === "user" ? "justify-end" : ""}`}
               >
                 {message.role === "assistant" && (
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
                     <Bot className="h-4 w-4 text-primary" />
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
+                  className={`max-w-[80%] rounded-lg p-3.5 shadow-2xs border ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground border-primary/25"
+                      : "bg-muted/50 border-border/30 text-foreground"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-[13.5px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 </div>
                 {message.role === "user" && (
-                  <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                    <User className="h-4 w-4" />
+                  <div className="h-8 w-8 rounded-full bg-secondary border border-border flex items-center justify-center shrink-0">
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                 )}
               </div>
             ))}
             {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
-              <div className="flex gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="flex gap-3 animate-card-enter">
+                <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
                   <Bot className="h-4 w-4 text-primary" />
                 </div>
-                <div className="bg-muted rounded-lg p-3">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="bg-muted/50 border border-border/30 rounded-lg p-4 shadow-2xs">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 </div>
               </div>
             )}
           </div>
         </ScrollArea>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2.5 mt-4 pt-3 border-t border-border/40 shrink-0">
           <Textarea
-            placeholder={t("输入您的回答...", "Type your answer...")}
+            placeholder={t("输入您的回答... (支持 Shift + Enter 换行)", "Type your answer... (Shift + Enter for new line)")}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => {
@@ -313,14 +321,14 @@ const MockInterview = ({ jobDescription }: MockInterviewProps) => {
                 sendMessage();
               }
             }}
-            className="min-h-[80px] resize-none"
+            className="min-h-[72px] h-[72px] resize-none border-border/60 focus-visible:ring-primary focus-visible:border-primary text-sm leading-relaxed"
             disabled={isLoading}
           />
           <Button 
             onClick={sendMessage} 
             disabled={!inputMessage.trim() || isLoading}
             size="icon"
-            className="shrink-0"
+            className="shrink-0 h-[72px] w-12 bg-primary hover:bg-primary/95 text-primary-foreground active:scale-[0.97]"
           >
             <Send className="h-4 w-4" />
           </Button>

@@ -16,105 +16,105 @@ const Help = () => {
   const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const faqs = [
-    {
-      category: t("入门指南", "Getting Started"),
-      icon: Zap,
-      questions: [
-        {
-          q: t("如何开始使用简历分析？", "How do I start using resume analysis?"),
-          a: t(
-            "只需将您的简历内容粘贴到文本框中，再输入目标职位描述，点击分析简历按钮即可。AI 将在几秒内生成详细的分析报告。",
-            "Simply paste your resume content into the text box, enter the target job description, and click Analyze Resume. The AI will generate a detailed analysis report within seconds."
-          ),
-        },
-        {
-          q: t("模拟面试支持哪些类型？", "What types of mock interviews are supported?"),
-          a: t(
-            "我们支持多种面试类型，包括行为面试、技术面试、案例面试等。AI 面试官会根据您提供的职位描述设计针对性的问题。",
-            "We support various interview types including behavioral, technical, and case interviews. The AI interviewer designs targeted questions based on the job description you provide."
-          ),
-        },
-        {
-          q: t("需要注册账号才能使用吗？", "Do I need to register to use the service?"),
-          a: t(
-            "基础功能无需注册即可使用。但注册账号后，您可以保存分析历史、追踪进度，并获得更个性化的体验。",
-            "Basic features can be used without registration. However, by registering, you can save analysis history, track progress, and get a more personalized experience."
-          ),
-        },
-      ],
-    },
-    {
-      category: t("数据安全", "Data Security"),
-      icon: Shield,
-      questions: [
-        {
-          q: t("我的数据安全吗？", "Is my data secure?"),
-          a: t(
-            "我们非常重视用户数据安全。所有数据传输都经过加密处理，简历内容仅用于分析目的，不会被存储或用于其他用途。",
-            "We take data security very seriously. All data transmission is encrypted, and resume content is only used for analysis purposes, not stored or used for other purposes."
-          ),
-        },
-        {
-          q: t("我的简历会被分享给第三方吗？", "Will my resume be shared with third parties?"),
-          a: t(
-            "绝对不会。我们严格遵守隐私政策，您的简历和个人信息不会被分享给任何第三方。数据完全在您的控制之下。",
-            "Absolutely not. We strictly follow our privacy policy. Your resume and personal information will never be shared with any third party. Your data is completely under your control."
-          ),
-        },
-      ],
-    },
-    {
-      category: t("功能使用", "Features"),
-      icon: FileText,
-      questions: [
-        {
-          q: t("免费版有什么限制？", "What are the limitations of the free version?"),
-          a: t(
-            "免费版提供基础的简历分析和模拟面试功能，每日有使用次数限制。如需无限使用和高级功能，请关注即将推出的企业版。",
-            "The free version provides basic resume analysis and mock interview features with daily usage limits. For unlimited usage and advanced features, stay tuned for our upcoming Enterprise version."
-          ),
-        },
-        {
-          q: t("如何提高分析准确度？", "How can I improve analysis accuracy?"),
-          a: t(
-            "提供更完整的简历内容和更详细的职位描述可以显著提高分析准确度。建议包含完整的工作经历、项目经验和技能描述。",
-            "Providing more complete resume content and detailed job descriptions can significantly improve accuracy. Include complete work experience, project experience, and skill descriptions."
-          ),
-        },
-        {
-          q: t("支持哪些语言？", "Which languages are supported?"),
-          a: t(
-            "目前我们支持中文和英文两种语言的简历分析和模拟面试。界面也提供中英文切换功能。",
-            "We currently support resume analysis and mock interviews in both Chinese and English. The interface also provides language switching between Chinese and English."
-          ),
-        },
-      ],
-    },
-    {
-      category: t("账户与付费", "Account & Billing"),
-      icon: CreditCard,
-      questions: [
-        {
-          q: t("企业版什么时候推出？", "When will the Enterprise version be available?"),
-          a: t(
-            "企业版正在开发中，预计不久后推出。如您有企业级需求，欢迎联系我们获取更多信息。",
-            "The Enterprise version is under development and expected to launch soon. If you have enterprise needs, please contact us for more information."
-          ),
-        },
-        {
-          q: t("如何联系客服？", "How do I contact customer service?"),
-          a: t(
-            "您可以通过邮件 biz@fyourwaycareer.com 联系我们，我们会在 24 小时内回复您的问题。",
-            "You can contact us via email at biz@fyourwaycareer.com. We will respond to your inquiry within 24 hours."
-          ),
-        },
-      ],
-    },
-  ];
-
   // Filter FAQs based on search query
   const filteredFaqs = useMemo(() => {
+    const faqs = [
+      {
+        category: t("入门指南", "Getting Started"),
+        icon: Zap,
+        questions: [
+          {
+            q: t("如何开始使用简历分析？", "How do I start using resume analysis?"),
+            a: t(
+              "只需将您的简历内容粘贴到文本框中，再输入目标职位描述，点击分析简历按钮即可。AI 将在几秒内生成详细的分析报告。",
+              "Simply paste your resume content into the text box, enter the target job description, and click Analyze Resume. The AI will generate a detailed analysis report within seconds."
+            ),
+          },
+          {
+            q: t("模拟面试支持哪些类型？", "What types of mock interviews are supported?"),
+            a: t(
+              "我们支持多种面试类型，包括行为面试、技术面试、案例面试等。AI 面试官会根据您提供的职位描述设计针对性的问题。",
+              "We support various interview types including behavioral, technical, and case interviews. The AI interviewer designs targeted questions based on the job description you provide."
+            ),
+          },
+          {
+            q: t("需要注册账号才能使用吗？", "Do I need to register to use the service?"),
+            a: t(
+              "基础功能无需注册即可使用。但注册账号后，您可以保存分析历史、追踪进度，并获得更个性化的体验。",
+              "Basic features can be used without registration. However, by registering, you can save analysis history, track progress, and get a more personalized experience."
+            ),
+          },
+        ],
+      },
+      {
+        category: t("数据安全", "Data Security"),
+        icon: Shield,
+        questions: [
+          {
+            q: t("我的数据安全吗？", "Is my data secure?"),
+            a: t(
+              "我们非常重视用户数据安全。所有数据传输都经过加密处理，简历内容仅用于分析目的，不会被存储或用于其他用途。",
+              "We take data security very seriously. All data transmission is encrypted, and resume content is only used for analysis purposes, not stored or used for other purposes."
+            ),
+          },
+          {
+            q: t("我的简历会被分享给第三方吗？", "Will my resume be shared with third parties?"),
+            a: t(
+              "绝对不会。我们严格遵守隐私政策，您的简历 and 个人信息不会被分享给任何第三方。数据完全在您的控制之下。",
+              "Absolutely not. We strictly follow our privacy policy. Your resume and personal information will never be shared with any third party. Your data is completely under your control."
+            ),
+          },
+        ],
+      },
+      {
+        category: t("功能使用", "Features"),
+        icon: FileText,
+        questions: [
+          {
+            q: t("免费版有什么限制？", "What are the limitations of the free version?"),
+            a: t(
+              "免费版提供基础的简历分析和模拟面试功能，每日有使用次数限制。如需无限使用和高级功能，请关注即将推出的企业版。",
+              "The free version provides basic resume analysis and mock interview features with daily usage limits. For unlimited usage and advanced features, stay tuned for our upcoming Enterprise version."
+            ),
+          },
+          {
+            q: t("如何提高分析准确度？", "How can I improve analysis accuracy?"),
+            a: t(
+              "提供更完整的简历内容和更详细的职位描述可以显著提高分析准确度。建议包含完整的工作经历、项目经验和技能描述。",
+              "Providing more complete resume content and detailed job descriptions can significantly improve accuracy. Include complete work experience, project experience, and skill descriptions."
+            ),
+          },
+          {
+            q: t("支持哪些语言？", "Which languages are supported?"),
+            a: t(
+              "目前我们支持中文和英文两种语言的简历分析和模拟面试。界面也提供中英文切换功能。",
+              "We currently support resume analysis and mock interviews in both Chinese and English. The interface also provides language switching between Chinese and English."
+            ),
+          },
+        ],
+      },
+      {
+        category: t("账户与付费", "Account & Billing"),
+        icon: CreditCard,
+        questions: [
+          {
+            q: t("企业版什么时候推出？", "When will the Enterprise version be available?"),
+            a: t(
+              "企业版正在开发中，预计不久后推出。如您有企业级需求，欢迎联系我们获取更多信息。",
+              "The Enterprise version is under development and expected to launch soon. If you have enterprise needs, please contact us for more information."
+            ),
+          },
+          {
+            q: t("如何联系客服？", "How do I contact customer service?"),
+            a: t(
+              "您可以通过邮件 biz@fyourwaycareer.com 联系我们，我们会在 24 小时内回复您的问题。",
+              "You can contact us via email at biz@fyourwaycareer.com. We will respond to your inquiry within 24 hours."
+            ),
+          },
+        ],
+      },
+    ];
+
     if (!searchQuery.trim()) return faqs;
     
     const query = searchQuery.toLowerCase();
@@ -124,7 +124,7 @@ const Help = () => {
         item => item.q.toLowerCase().includes(query) || item.a.toLowerCase().includes(query)
       ),
     })).filter(category => category.questions.length > 0);
-  }, [searchQuery, language]);
+  }, [searchQuery, t]);
 
   const totalResults = filteredFaqs.reduce((acc, cat) => acc + cat.questions.length, 0);
 

@@ -8,10 +8,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useApiConfig } from "@/hooks/useApiConfig";
 import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, FileText, Briefcase, Sparkles, MessageSquare } from "lucide-react";
+import { Loader2, FileText, Briefcase, Sparkles, MessageSquare, Compass } from "lucide-react";
 import AnalysisResult from "./AnalysisResult";
 import MockInterview from "./MockInterview";
 import ApiRequiredAlert from "./ApiRequiredAlert";
+import CareerRoadmap from "./CareerRoadmap";
 
 interface AnalysisData {
   totalScore?: number;
@@ -50,7 +51,7 @@ const ResumeAnalyzer = () => {
   const { t } = useLanguage();
 
   useEffect(() => {
-    const handleTabSwitch = (event: CustomEvent<"analyze" | "interview">) => {
+    const handleTabSwitch = (event: CustomEvent<"analyze" | "interview" | "roadmap">) => {
       setActiveTab(event.detail);
     };
 
@@ -118,7 +119,7 @@ const ResumeAnalyzer = () => {
       {!hasApiConfig && <ApiRequiredAlert />}
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto h-12 bg-muted/50 p-1" data-tour-step="tabs">
+        <TabsList className="grid w-full grid-cols-3 max-w-xl mx-auto h-12 bg-muted/50 p-1" data-tour-step="tabs">
           <TabsTrigger value="analyze" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm" data-tour-step="analyze-tab">
             <Sparkles className="h-4 w-4" />
             {t("简历分析", "Resume Analysis")}
@@ -126,6 +127,10 @@ const ResumeAnalyzer = () => {
           <TabsTrigger value="interview" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm" data-tour-step="interview-tab">
             <MessageSquare className="h-4 w-4" />
             {t("模拟面试", "Mock Interview")}
+          </TabsTrigger>
+          <TabsTrigger value="roadmap" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm" data-tour-step="roadmap-tab">
+            <Compass className="h-4 w-4" />
+            {t("职业规划", "Career Planning")}
           </TabsTrigger>
         </TabsList>
 
@@ -251,6 +256,10 @@ const ResumeAnalyzer = () => {
 
             <MockInterview jobDescription={jobDescription} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="roadmap" className="mt-10">
+          <CareerRoadmap resumeContent={resume} />
         </TabsContent>
       </Tabs>
     </div>
